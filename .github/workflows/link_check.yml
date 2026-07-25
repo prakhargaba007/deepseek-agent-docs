@@ -45,6 +45,6 @@ jobs:
             --file README.md \
             --timeout 15 \
             --delay 1.0
-        # Don't fail the build for README links — they include
-        # placeholder URLs (YOUR_USERNAME) that are intentionally invalid.
+        # Soft-fail for README since some links (stars, releases) need the
+        # repo to be public before they resolve correctly.
         continue-on-error: true

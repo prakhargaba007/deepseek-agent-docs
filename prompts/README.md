@@ -12,6 +12,7 @@ Ready-to-use prompts for popular AI coding agents. These prompts instruct the ag
 
 | File | Tool | Where to Place |
 |---|---|---|
+| [`antigravity.md`](antigravity.md) | Antigravity | Copy `SKILL.md` + `deepseek.md` to `~/.gemini/config/skills/deepseek-api/` |
 | [`cursor.md`](cursor.md) | Cursor | `.cursor/rules/deepseek.mdc` or `.cursorrules` |
 | [`claude_code.md`](claude_code.md) | Claude Code | `CLAUDE.md` in your project root |
 | [`codex_cli.md`](codex_cli.md) | Codex CLI | Pass as `--instructions` or system prompt |

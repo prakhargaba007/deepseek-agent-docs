@@ -65,5 +65,5 @@ and this project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD`).
 
 ---
 
-[Unreleased]: https://github.com/YOUR_USERNAME/deepseek-api-docs/compare/v2026.07.25...HEAD
-[2026.07.25]: https://github.com/YOUR_USERNAME/deepseek-api-docs/releases/tag/v2026.07.25
+[Unreleased]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.07.25...HEAD
+[2026.07.25]: https://github.com/prakhargaba007/deepseek-agent-docs/releases/tag/v2026.07.25

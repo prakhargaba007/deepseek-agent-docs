@@ -71,7 +71,7 @@ def check_link(
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (compatible; deepseek-docs-link-checker/1.0; "
-            "+https://github.com/YOUR_USERNAME/deepseek-api-docs)"
+            "+https://github.com/prakhargaba007/deepseek-agent-docs)"
         )
     }
 

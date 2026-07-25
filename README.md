@@ -1,403 +1,245 @@
 <div align="center">
 
-# 🤖 DeepSeek API — Agent-Optimized Documentation
+<img src=".github/social-preview.png" alt="deepseek-agent-docs — Complete DeepSeek API reference in one Markdown file" width="100%">
 
-**The definitive community-maintained Markdown reference for the DeepSeek API.**  
-*Designed to be loaded by AI coding agents instead of crawling the web.*
+<br><br>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2026.07.25-green.svg)](VERSION)
-[![Documentation](https://img.shields.io/badge/deepseek.md-2%2C348%20lines-orange.svg)](deepseek.md)
-[![Last Updated](https://img.shields.io/badge/last%20updated-July%202026-lightgrey.svg)](CHANGELOG.md)
+# deepseek-agent-docs
+
+**The complete DeepSeek API reference in a single Markdown file — built for AI coding agents.**
+
+Give your agent one file. Get accurate DeepSeek API calls. No web crawling. No stale training data.
+
+<br>
+
+[![License](https://img.shields.io/github/license/prakhargaba007/deepseek-agent-docs?color=blue)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/prakhargaba007/deepseek-agent-docs?color=green&label=last%20updated)](https://github.com/prakhargaba007/deepseek-agent-docs/commits/main)
+[![Stars](https://img.shields.io/github/stars/prakhargaba007/deepseek-agent-docs?style=social)](https://github.com/prakhargaba007/deepseek-agent-docs/stargazers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![GitHub Stars](https://img.shields.io/github/stars/YOUR_USERNAME/deepseek-api-docs?style=social)](https://github.com/YOUR_USERNAME/deepseek-api-docs)
+[![OpenAI Compatible](https://img.shields.io/badge/OpenAI_SDK-compatible-412991?logo=openai&logoColor=white)](deepseek.md#7-openai-compatibility)
+[![Anthropic Compatible](https://img.shields.io/badge/Anthropic_SDK-compatible-D97706?logo=anthropic&logoColor=white)](deepseek.md#8-anthropic-api-compatibility)
 
-[📄 View Documentation](deepseek.md) · [🚀 Quick Start](#-quick-start) · [🤖 AI Agent Usage](#-ai-agent-usage) · [💡 Examples](examples/) · [🤝 Contributing](CONTRIBUTING.md)
+<br>
+
+**Works with →**
+[Cursor](prompts/cursor.md) · [Claude Code](prompts/claude_code.md) · [Codex CLI](prompts/codex_cli.md) · [OpenHands](prompts/openhands.md) · [Roo Code](prompts/roo_code.md) · [Continue](prompts/continue.md) · [Antigravity](prompts/antigravity.md) · [Windsurf](prompts/generic_agent.md) · [Any Agent](prompts/generic_agent.md)
 
 </div>
 
 ---
 
-## 🎯 Why This Exists
+## What is this?
 
-When you're building with the DeepSeek API, your AI coding agent has two options:
+When you ask an AI coding agent to write DeepSeek API code, it either:
 
-| Without This Repo | With This Repo |
+- 🔴 **Guesses** from training data (outdated model names, wrong parameters)
+- 🔴 **Crawls the web** (slow, unreliable, blocked behind auth)
+
+This repository gives you [`deepseek.md`](deepseek.md) — a single, 75 KB Markdown file covering the entire DeepSeek API. Drop it into your project. Point your agent at it. Done.
+
+| Without this | With this |
 |---|---|
-| ❌ Crawls the web (slow, unreliable) | ✅ Reads a local file (instant) |
-| ❌ Relies on stale training data | ✅ Gets current, accurate API specs |
-| ❌ Misses edge cases and gotchas | ✅ Includes hidden details & edge cases |
-| ❌ Wrong model names, deprecated params | ✅ Up-to-date model names & pricing |
-| ❌ Inconsistent code examples | ✅ Runnable, tested examples |
-
-Just drop [`deepseek.md`](deepseek.md) into your project (or point your agent to it), and your agent will use it as its authoritative source for the DeepSeek API — no web searches required.
+| Uses deprecated `deepseek-chat` / `deepseek-reasoner` | ✅ Correct `deepseek-v4-pro` / `deepseek-v4-flash` |
+| Guesses at `reasoning_effort` behavior | ✅ Exact parameter docs with defaults |
+| Missing `extra_body` for thinking mode | ✅ Full OpenAI SDK workaround documented |
+| No knowledge of context caching | ✅ Cache hit/miss rules, ~50× cost savings |
+| Generic error handling | ✅ All 7 error codes with retry strategy |
 
 ---
 
-## ✨ Features
+## 30-Second Setup
 
-- 📄 **Single File** — The entire DeepSeek API in one Markdown file (`deepseek.md`, ~75 KB)
-- 🧠 **Thinking Mode Coverage** — Full docs for `reasoning_effort`, chain-of-thought, multi-turn behavior
-- 🔄 **OpenAI + Anthropic Compatibility** — Exact migration steps for both SDKs
-- ⚡ **All Endpoints** — Chat Completions, FIM (Beta), List Models, User Balance
-- 🛠️ **Tool Calling** — Standard and strict mode with JSON Schema examples
-- 💾 **Context Caching** — How it works, when cache hits/misses occur, cost impact
-- 🤖 **Agent Integrations** — Claude Code, GitHub Copilot, OpenCode configuration
-- 🎯 **Production-Ready** — Rate limits, error handling, retry strategies, best practices
-- 🧩 **17 Code Examples** — Python, JavaScript, TypeScript, cURL, Anthropic SDK
-- 💬 **7 Agent Prompts** — Ready-to-use prompts for Cursor, Claude Code, Codex CLI, and more
-- 🔍 **Hidden Details** — Edge cases, undocumented caveats, compatibility quirks
-
----
-
-## 📋 Table of Contents
-
-- [Why This Exists](#-why-this-exists)
-- [Features](#-features)
-- [Supported Models](#-supported-models)
-- [Supported APIs](#-supported-apis)
-- [Quick Start](#-quick-start)
-- [AI Agent Usage](#-ai-agent-usage)
-- [Repository Structure](#-repository-structure)
-- [Example Prompts](#-example-prompts)
-- [Examples Overview](#-examples-overview)
-- [Updating the Documentation](#-updating-the-documentation)
-- [Versioning](#-versioning)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Credits](#-credits)
-- [Disclaimer](#-disclaimer)
-
----
-
-## 🤖 Supported Models
-
-| Model | Context | Max Output | Thinking | Tools | Best For |
-|---|---|---|---|---|---|
-| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ Default on | ✅ | Complex reasoning, coding, agent tasks |
-| `deepseek-v4-flash` | 1M tokens | 384K tokens | ✅ Default on | ✅ | Fast responses, cost-sensitive apps |
-
-> **Deprecated names** (removed 2026-07-24): `deepseek-chat` → `deepseek-v4-flash`, `deepseek-reasoner` → `deepseek-v4-flash` (thinking mode)
-
----
-
-## 🔌 Supported APIs
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/chat/completions` | `POST` | Primary chat/reasoning endpoint |
-| `/completions` (Beta) | `POST` | FIM (Fill-in-the-Middle) for code completion |
-| `/models` | `GET` | List available models |
-| `/user/balance` | `GET` | Check account balance |
-
-**Compatibility:**
-- ✅ OpenAI SDK (Python + Node.js) — drop-in with `base_url` swap
-- ✅ Anthropic SDK (Python) — with `base_url` and model name mapping
-- ✅ Claude Code, OpenCode, GitHub Copilot agent integrations
-
----
-
-## 🚀 Quick Start
-
-**Install the OpenAI SDK:**
+**Get the file:**
 ```bash
-pip install openai       # Python
-npm install openai       # Node.js / TypeScript
+curl -O https://raw.githubusercontent.com/prakhargaba007/deepseek-agent-docs/main/deepseek.md
 ```
 
-**Set your API key:**
-```bash
-export DEEPSEEK_API_KEY="sk-your-key-here"
+**Tell your agent to use it** (add to `.cursorrules`, `CLAUDE.md`, or your system prompt):
+```
+When writing DeepSeek API code, read deepseek.md first. It is the authoritative reference.
+Do NOT use training data or web searches for DeepSeek API details.
 ```
 
-**Your first call:**
+**Your first API call:**
 ```python
 import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key=os.environ.get("DEEPSEEK_API_KEY"),
+    api_key=os.environ["DEEPSEEK_API_KEY"],
     base_url="https://api.deepseek.com"
 )
 
 response = client.chat.completions.create(
     model="deepseek-v4-pro",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Hello!"}
-    ]
+    messages=[{"role": "user", "content": "Hello!"}],
+    reasoning_effort="high",
+    extra_body={"thinking": {"type": "enabled"}}  # Required for thinking mode via OpenAI SDK
 )
 
 print(response.choices[0].message.content)
 ```
 
-For more examples, see the [`examples/`](examples/) folder.
-
 ---
 
-## 🤖 AI Agent Usage
+## What's in `deepseek.md`?
 
-### Option 1: Copy `deepseek.md` into your project
-
-The simplest and most reliable approach. Copy the file anywhere in your codebase:
-
-```bash
-# Into your docs folder
-cp deepseek.md ./docs/deepseek.md
-
-# Or into your agent skills directory
-cp deepseek.md .agents/skills/deepseek/deepseek.md
-```
-
-Then tell your agent to reference it:
-> "When writing code that calls the DeepSeek API, always refer to `docs/deepseek.md` as your source of truth."
-
----
-
-### Option 2: Use as an Agent Skill
-
-Copy `SKILL.md` into your agent's skill directory. Compatible with Antigravity, Cursor, OpenHands, and any agent that supports skill directories.
-
-```bash
-# Antigravity / Cursor global skills
-cp SKILL.md ~/.gemini/config/skills/deepseek/SKILL.md
-cp deepseek.md ~/.gemini/config/skills/deepseek/deepseek.md
-
-# Project-scoped skills
-mkdir -p .agents/skills/deepseek
-cp SKILL.md .agents/skills/deepseek/SKILL.md
-cp deepseek.md .agents/skills/deepseek/deepseek.md
-```
-
----
-
-### Option 3: Cursor Rules
-
-Add to your `.cursor/rules/deepseek.mdc` or `.cursorrules`:
-
-```markdown
-When writing or reviewing code that integrates with the DeepSeek API,
-ALWAYS refer to the file at `deepseek.md` in this repository as your
-primary source of truth. Do NOT rely on your training data or web searches
-for DeepSeek API specifications, model names, or parameter behavior.
-```
-
----
-
-### Option 4: Direct URL (Online Agents)
-
-For agents that can fetch URLs or support `llms.txt`:
-
-```
-# Raw file URL
-https://raw.githubusercontent.com/YOUR_USERNAME/deepseek-api-docs/main/deepseek.md
-
-# llms.txt entry point
-https://YOUR_USERNAME.github.io/deepseek-api-docs/llms.txt
-```
-
----
-
-### Option 5: Tool-Specific Prompts
-
-Ready-to-use agent prompts are in the [`prompts/`](prompts/) folder:
-
-| Tool | Prompt File |
+| Section | Coverage |
 |---|---|
-| Cursor | [prompts/cursor.md](prompts/cursor.md) |
-| Claude Code | [prompts/claude_code.md](prompts/claude_code.md) |
-| Codex CLI | [prompts/codex_cli.md](prompts/codex_cli.md) |
-| OpenHands | [prompts/openhands.md](prompts/openhands.md) |
-| Roo Code | [prompts/roo_code.md](prompts/roo_code.md) |
-| Continue | [prompts/continue.md](prompts/continue.md) |
-| Generic Agent | [prompts/generic_agent.md](prompts/generic_agent.md) |
+| Models & Pricing | `deepseek-v4-pro`, `deepseek-v4-flash`, deprecation timeline, pricing table |
+| All Endpoints | Chat Completions, FIM (Beta), List Models, User Balance |
+| Parameters | Every parameter with type, default, and behavior notes |
+| Thinking Mode | Toggle, `reasoning_effort`, `reasoning_content` multi-turn rules |
+| Streaming | SSE format, usage stats in final chunk |
+| Tool Calling | Standard + strict mode, full JSON Schema reference |
+| JSON Output | `response_format`, required prompt patterns |
+| Context Caching | Cache hit rules, persistence timing, ~50× cost reduction |
+| FIM Completion | Fill-in-the-Middle for code, beta endpoint setup |
+| OpenAI Compat. | Migration steps, unsupported parameters, `extra_body` workaround |
+| Anthropic Compat. | Model mapping, SDK setup, Claude Code env vars |
+| Agent Integrations | Claude Code, GitHub Copilot, OpenCode configuration |
+| Rate Limits | Concurrency per model, `user_id` isolation |
+| Error Codes | All 7 codes with causes and solutions |
+| Best Practices | Production, prompt engineering, cost & latency optimization |
+| Hidden Edge Cases | 16 undocumented caveats and compatibility quirks |
 
 ---
 
-## 📂 Repository Structure
+## AI Agent Setup
+
+### Cursor
+
+Add to `.cursor/rules/deepseek.mdc`:
+```
+Read deepseek.md before writing any DeepSeek API code.
+Use deepseek-v4-pro or deepseek-v4-flash. Never use deepseek-chat or deepseek-reasoner (deprecated).
+Pass thinking via extra_body={"thinking": {"type": "enabled"}} when using the OpenAI SDK.
+```
+
+### Claude Code
+
+```bash
+# .env or shell profile
+export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+export ANTHROPIC_AUTH_TOKEN=$DEEPSEEK_API_KEY
+export ANTHROPIC_MODEL=deepseek-v4-pro
+export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
+export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
+export CLAUDE_CODE_EFFORT_LEVEL=max
+```
+
+Add to `CLAUDE.md`: `For DeepSeek API code, read deepseek.md first.`
+
+### Other Agents
+
+| Agent | Setup |
+|---|---|
+| Antigravity | Copy `SKILL.md` + `deepseek.md` to `~/.gemini/config/skills/deepseek-api/` — see [`prompts/antigravity.md`](prompts/antigravity.md) |
+| Codex CLI | Pass [`prompts/codex_cli.md`](prompts/codex_cli.md) as system instructions |
+| OpenHands | Use [`prompts/openhands.md`](prompts/openhands.md) as microagent context |
+| Roo Code | Place [`prompts/roo_code.md`](prompts/roo_code.md) at `.roo/rules/deepseek.md` |
+| Continue | See [`prompts/continue.md`](prompts/continue.md) for `config.json` setup |
+| Any agent | Copy [`prompts/generic_agent.md`](prompts/generic_agent.md) into system prompt |
+
+---
+
+## Supported Models
+
+| Model | Context | Max Output | Thinking | Pricing (input/output per 1M) |
+|---|---|---|---|---|
+| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ on by default | $0.435 / $0.87 (cache miss) |
+| `deepseek-v4-flash` | 1M tokens | 384K tokens | ✅ on by default | $0.14 / $0.28 (cache miss) |
+
+> Cache hits are **~50× cheaper**. See [Section 6.6](deepseek.md#66-context-caching) for rules.
+
+---
+
+## Examples
+
+| File | What It Shows |
+|---|---|
+| [`python/basic_chat.py`](examples/python/basic_chat.py) | Minimal API call + usage stats |
+| [`python/streaming.py`](examples/python/streaming.py) | SSE streaming with token counts |
+| [`python/thinking_mode.py`](examples/python/thinking_mode.py) | Reasoning mode + multi-turn `reasoning_content` |
+| [`python/tool_calling.py`](examples/python/tool_calling.py) | Full tool call agent loop |
+| [`python/json_output.py`](examples/python/json_output.py) | Structured JSON extraction |
+| [`python/fim_completion.py`](examples/python/fim_completion.py) | Fill-in-the-Middle code completion |
+| [`python/multi_turn.py`](examples/python/multi_turn.py) | Conversation manager with history trimming |
+| [`javascript/basic_chat.js`](examples/javascript/basic_chat.js) | Node.js ESM chat |
+| [`javascript/streaming.js`](examples/javascript/streaming.js) | Node.js streaming |
+| [`javascript/tool_calling.js`](examples/javascript/tool_calling.js) | Node.js tool calling loop |
+| [`typescript/basic_chat.ts`](examples/typescript/basic_chat.ts) | Fully typed completion |
+| [`typescript/reasoning_with_retry.ts`](examples/typescript/reasoning_with_retry.ts) | Thinking mode + exponential backoff |
+| [`curl/basic_chat.sh`](examples/curl/basic_chat.sh) | Minimal cURL call |
+| [`curl/streaming.sh`](examples/curl/streaming.sh) | cURL + SSE parsing |
+| [`curl/fim.sh`](examples/curl/fim.sh) | FIM via cURL (beta) |
+| [`anthropic_sdk/basic_chat.py`](examples/anthropic_sdk/basic_chat.py) | Anthropic SDK → DeepSeek |
+| [`anthropic_sdk/claude_code_setup.sh`](examples/anthropic_sdk/claude_code_setup.sh) | Claude Code env setup script |
+
+---
+
+## Repository Structure
 
 ```text
-deepseek-api-docs/
+deepseek-agent-docs/
+├── deepseek.md          ← The documentation (load this into your agent)
+├── SKILL.md             ← Agent skill definition (Cursor / OpenHands / Antigravity)
+├── llms.txt             ← Standard llms.txt entry point
 │
-├── deepseek.md              # 📄 The main documentation (2,348 lines)
-├── README.md                # This file
-├── SKILL.md                 # Agent skill definition
-├── llms.txt                 # Standard llms.txt entry point
-├── CONTRIBUTING.md          # Contributor guide
-├── CHANGELOG.md             # Version history
-├── SECURITY.md              # Security policy
-├── VERSION                  # Current version (CalVer: YYYY.MM.DD)
-├── LICENSE                  # MIT License
-│
-├── examples/                # 💡 Runnable code examples
-│   ├── README.md
-│   ├── python/              # Python + OpenAI SDK examples
-│   ├── javascript/          # Node.js examples
-│   ├── typescript/          # TypeScript examples
-│   ├── curl/                # cURL shell examples
-│   └── anthropic_sdk/       # Anthropic SDK examples
-│
-├── prompts/                 # 💬 Ready-to-use AI agent prompts
-│   ├── README.md
-│   ├── cursor.md
-│   ├── claude_code.md
-│   ├── codex_cli.md
-│   ├── openhands.md
-│   ├── roo_code.md
-│   ├── continue.md
-│   └── generic_agent.md
-│
-├── scripts/                 # 🔧 Maintenance scripts
-│   ├── README.md
-│   ├── validate_links.py    # Check all HTTP links in deepseek.md
-│   ├── check_formatting.py  # Validate markdown structure
-│   └── generate_toc.py      # Auto-generate table of contents
-│
-└── .github/                 # ⚙️ GitHub configuration
-    ├── ISSUE_TEMPLATE/
-    │   ├── bug_report.yml
-    │   └── feature_request.yml
-    ├── PULL_REQUEST_TEMPLATE.md
-    └── workflows/
-        ├── markdown_lint.yml
-        └── link_check.yml
+├── examples/            ← 17 runnable examples (Python, JS, TS, cURL, Anthropic)
+├── prompts/             ← 7 tool-specific agent prompts (Cursor, Claude Code, etc.)
+├── scripts/             ← Maintenance scripts (link checker, formatter, ToC gen)
+└── .github/             ← Issue templates, PR template, Actions workflows
 ```
 
 ---
 
-## 💬 Example Prompts
+## Keeping It Updated
 
-### For Cursor (`.cursorrules`)
+When DeepSeek releases new features:
 
-```
-When writing or debugging code that calls the DeepSeek API:
-1. Open and read deepseek.md first.
-2. Use ONLY the model names, endpoints, and parameter names documented there.
-3. Do NOT guess at parameter behavior — check the Parameters Reference section.
-4. For thinking mode, always pass thinking via extra_body when using the OpenAI SDK.
-```
-
-### For Claude Code
-
-```bash
-export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
-export ANTHROPIC_AUTH_TOKEN=sk-your-key
-export ANTHROPIC_MODEL=deepseek-v4-pro
-```
-
-Then in your project's `CLAUDE.md`:
-```
-For all DeepSeek API code, read deepseek.md before writing any implementation.
-```
-
-See the full [`prompts/`](prompts/) directory for tool-specific instructions.
+1. Check [api-docs.deepseek.com](https://api-docs.deepseek.com)
+2. Update `deepseek.md`
+3. Update `VERSION` and `CHANGELOG.md`
+4. Run `python scripts/validate_links.py` and `python scripts/check_formatting.py`
+5. Open a PR — see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
-## 🗂️ Examples Overview
+## Versioning
 
-| File | Language | What It Demonstrates |
-|---|---|---|
-| [`python/basic_chat.py`](examples/python/basic_chat.py) | Python | Basic chat completion |
-| [`python/streaming.py`](examples/python/streaming.py) | Python | Streaming with usage stats |
-| [`python/thinking_mode.py`](examples/python/thinking_mode.py) | Python | Thinking mode + multi-turn |
-| [`python/tool_calling.py`](examples/python/tool_calling.py) | Python | Full tool call loop |
-| [`python/json_output.py`](examples/python/json_output.py) | Python | Structured JSON extraction |
-| [`python/fim_completion.py`](examples/python/fim_completion.py) | Python | Fill-in-the-Middle (Beta) |
-| [`python/multi_turn.py`](examples/python/multi_turn.py) | Python | Multi-turn conversation |
-| [`javascript/basic_chat.js`](examples/javascript/basic_chat.js) | JavaScript | Basic chat (ESM) |
-| [`javascript/streaming.js`](examples/javascript/streaming.js) | JavaScript | Streaming |
-| [`javascript/tool_calling.js`](examples/javascript/tool_calling.js) | JavaScript | Tool calling |
-| [`typescript/basic_chat.ts`](examples/typescript/basic_chat.ts) | TypeScript | Typed chat completion |
-| [`typescript/reasoning_with_retry.ts`](examples/typescript/reasoning_with_retry.ts) | TypeScript | Thinking mode + retry logic |
-| [`curl/basic_chat.sh`](examples/curl/basic_chat.sh) | cURL | Minimal API call |
-| [`curl/streaming.sh`](examples/curl/streaming.sh) | cURL | SSE streaming |
-| [`curl/fim.sh`](examples/curl/fim.sh) | cURL | FIM completion |
-| [`anthropic_sdk/basic_chat.py`](examples/anthropic_sdk/basic_chat.py) | Python | Anthropic SDK with DeepSeek |
-| [`anthropic_sdk/claude_code_setup.sh`](examples/anthropic_sdk/claude_code_setup.sh) | Bash | Claude Code env setup |
+Uses **Calendar Versioning** (`YYYY.MM.DD`) — the version number tells you when the docs were last synced, which is exactly what matters for a documentation project.
+
+Current: `2026.07.25` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/prakhargaba007/deepseek-agent-docs/releases)
 
 ---
 
-## 🔄 Updating the Documentation
+## Contributing
 
-When DeepSeek releases new API features or model updates:
+- 🐛 **Wrong info?** → [Open a Bug Report](https://github.com/prakhargaba007/deepseek-agent-docs/issues/new?template=bug_report.yml)
+- ✨ **Want to add something?** → [Open a Feature Request](https://github.com/prakhargaba007/deepseek-agent-docs/issues/new?template=feature_request.yml)
+- 📖 **Ready to contribute?** → Read [CONTRIBUTING.md](CONTRIBUTING.md)
 
-1. Check [api-docs.deepseek.com](https://api-docs.deepseek.com) for changes.
-2. Update `deepseek.md` with the new information.
-3. Update the version header in `deepseek.md` and the `VERSION` file.
-4. Add a `CHANGELOG.md` entry.
-5. Open a PR — see [CONTRIBUTING.md](CONTRIBUTING.md) for the full process.
-
-Run the validation scripts to check your changes:
-
-```bash
-python scripts/validate_links.py
-python scripts/check_formatting.py
-```
+Issues tagged [`good first issue`](https://github.com/prakhargaba007/deepseek-agent-docs/labels/good%20first%20issue) are a great starting point.
 
 ---
 
-## 📌 Versioning
+## License
 
-This project uses **Calendar Versioning** (`YYYY.MM.DD`):
-
-```
-2026.07.25   ← Date the documentation was last synchronized
-```
-
-CalVer is chosen over SemVer because the version number communicates the most important piece of information for a documentation repository: **when it was last updated**. This helps developers quickly assess staleness.
-
-Git tags follow the pattern `v2026.07.25`.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-1. **Found incorrect info?** → [Open a Bug Report](../../issues/new?template=bug_report.yml)
-2. **Want to add an example?** → [Open a Feature Request](../../issues/new?template=feature_request.yml)
-3. **Ready to contribute?** → Read [CONTRIBUTING.md](CONTRIBUTING.md)
-
-**Great first issues** are tagged with [`good first issue`](../../labels/good%20first%20issue).
-
-### GitHub Topics
-
-This repository is tagged with:
-`deepseek` · `deepseek-api` · `llm` · `ai-agent` · `markdown` · `documentation` · `openai-compatible` · `anthropic-compatible` · `cursor` · `claude-code` · `codex` · `openhands` · `continue` · `roo-code` · `llms-txt`
-
----
-
-## 📜 License
-
-Distributed under the [MIT License](LICENSE). You are free to use, modify, and distribute this documentation in any project, including commercial ones.
-
----
-
-## 🙏 Credits
-
-- **Documentation source**: [api-docs.deepseek.com](https://api-docs.deepseek.com) (official DeepSeek API documentation)
-- **Maintainer**: [Prakhar](https://github.com/YOUR_USERNAME)
-- **Contributors**: See [Contributors](../../graphs/contributors)
-
----
-
-## ⚠️ Disclaimer
-
-> **This is an unofficial, community-maintained resource.**
->
-> The official DeepSeek API documentation at [api-docs.deepseek.com](https://api-docs.deepseek.com) is always the authoritative source of truth. This repository aims to mirror it accurately, but there may be a lag between official updates and updates here.
->
-> Always verify critical API behavior against the official documentation before deploying to production.
->
-> This project is not affiliated with, endorsed by, or sponsored by DeepSeek.
+[MIT](LICENSE) — use freely in any project, commercial or otherwise.
 
 ---
 
 <div align="center">
 
-**⭐ If this saved you time, please star the repository! ⭐**
+**Source**: [api-docs.deepseek.com](https://api-docs.deepseek.com) · **Maintainer**: [prakhargaba007](https://github.com/prakhargaba007)
 
-[Report Issue](../../issues/new?template=bug_report.yml) · [Request Feature](../../issues/new?template=feature_request.yml) · [View Documentation](deepseek.md)
+> ⚠️ **Unofficial community resource.** Not affiliated with DeepSeek.  
+> The official docs are always the source of truth. Always verify before production deployment.
+
+<br>
+
+**If this saved you time →** [⭐ Star it](https://github.com/prakhargaba007/deepseek-agent-docs/stargazers)
 
 </div>

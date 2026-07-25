@@ -30,8 +30,8 @@ No build step is required — this is a documentation-only repository.
 
 ```bash
 # 1. Fork and clone the repository
-git clone https://github.com/YOUR_USERNAME/deepseek-api-docs.git
-cd deepseek-api-docs
+git clone https://github.com/prakhargaba007/deepseek-agent-docs.git
+cd deepseek-agent-docs
 
 # 2. (Optional) Set up Python for running maintenance scripts
 python3 -m venv .venv
