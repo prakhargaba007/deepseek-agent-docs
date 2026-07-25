@@ -1,0 +1,7 @@
+# DeepSeek API Reference for AI Agents
+
+> Single-file, agent-optimized reference documentation for the DeepSeek API (Chat Completions, Thinking/Reasoning Mode, FIM, Tool Calling, OpenAI/Anthropic Compatibility).
+
+## Core Documentation
+
+- [DeepSeek API Complete Developer Reference](deepseek.md): Complete single-file documentation covering authentication, endpoints, parameters, features, thinking mode, SDK examples, rate limits, and best practices.

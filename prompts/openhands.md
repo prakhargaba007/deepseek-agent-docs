@@ -1,0 +1,58 @@
+# DeepSeek API — OpenHands / All-Hands Instructions
+
+Use this as a microagent instruction file for OpenHands, or as a system
+prompt when launching an OpenHands agent on a DeepSeek-integrated project.
+
+---
+
+## Context
+
+This workspace contains a project that integrates with the DeepSeek API.
+
+## Critical Rule
+
+**Before writing any code that calls the DeepSeek API, read the file
+`deepseek.md` located in the repository root.**
+
+This file is a complete, single-file reference for the DeepSeek API.
+It supersedes any DeepSeek API information from your training data or
+from web searches.
+
+## Key Facts (Quick Reference)
+
+### Models
+- `deepseek-v4-pro`: 1M context, 384K max output, thinking enabled by default
+- `deepseek-v4-flash`: 1M context, 384K max output, faster and cheaper
+
+### Base URLs
+- `https://api.deepseek.com` — standard (OpenAI-compatible)
+- `https://api.deepseek.com/beta` — beta features (FIM, prefix completion)
+- `https://api.deepseek.com/anthropic` — Anthropic-compatible format
+
+### Thinking Mode
+```python
+# Always pass via extra_body when using OpenAI SDK
+client.chat.completions.create(
+    model="deepseek-v4-pro",
+    messages=[...],
+    reasoning_effort="high",
+    extra_body={"thinking": {"type": "enabled"}}
+)
+```
+
+### Environment Variables
+```bash
+export DEEPSEEK_API_KEY="sk-..."
+```
+
+### Error Codes
+- 400: Invalid format
+- 401: Bad API key
+- 402: Insufficient balance
+- 429: Rate limit — use exponential backoff
+- 500/503: Server error — retry with backoff
+
+## Files to Reference
+- `deepseek.md` — Complete API reference (authoritative)
+- `examples/python/` — Runnable Python examples
+- `examples/typescript/` — Runnable TypeScript examples

@@ -1,0 +1,82 @@
+name: Bug Report
+description: Report incorrect API information, broken examples, or bad links.
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping keep this documentation accurate!
+        Please fill out this form as completely as possible.
+
+  - type: dropdown
+    id: section
+    attributes:
+      label: Which section is affected?
+      options:
+        - "Section 1: Overview & Quick Start"
+        - "Section 2: Authentication"
+        - "Section 3: Models & Pricing"
+        - "Section 4: API Endpoints"
+        - "Section 5: Parameters Reference"
+        - "Section 6: Features"
+        - "Section 7: OpenAI Compatibility"
+        - "Section 8: Anthropic API Compatibility"
+        - "Section 9: Agent Integrations"
+        - "Section 10: Rate Limits & Isolation"
+        - "Section 11: Error Codes & Handling"
+        - "Section 12: Token Usage"
+        - "Section 13: SDK Examples"
+        - "Section 14: Best Practices"
+        - "Section 15: Production Examples"
+        - "Section 16: Changelog"
+        - "Section 17: Hidden Details & Edge Cases"
+        - "examples/ — Code examples"
+        - "prompts/ — Agent prompts"
+        - "README.md"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: line
+    attributes:
+      label: Line number (if known)
+      placeholder: "e.g. 234"
+    validations:
+      required: false
+
+  - type: textarea
+    id: current
+    attributes:
+      label: What does the documentation currently say?
+      description: Quote the exact text or describe the current behavior.
+      placeholder: "The documentation says..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct
+    attributes:
+      label: What should it say?
+      description: Describe the correct information.
+      placeholder: "It should say..."
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source (official documentation link)
+      description: Link to the official DeepSeek API documentation that confirms the correct behavior.
+      placeholder: "https://api-docs.deepseek.com/..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other information that would help us fix this.
+    validations:
+      required: false

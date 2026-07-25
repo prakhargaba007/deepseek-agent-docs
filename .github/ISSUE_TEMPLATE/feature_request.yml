@@ -1,0 +1,60 @@
+name: Feature Request
+description: Suggest a new example, agent prompt, script, or documentation improvement.
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement!
+        Before submitting, please check that a similar request hasn't already been opened.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: What type of feature are you requesting?
+      options:
+        - "New code example (examples/)"
+        - "New agent prompt (prompts/)"
+        - "New maintenance script (scripts/)"
+        - "New documentation section in deepseek.md"
+        - "Improvement to README.md"
+        - "New GitHub Action / CI check"
+        - "Translation (new language)"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or gap this feature addresses.
+      placeholder: "As a developer using X, I find it difficult to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe what you'd like to see added or changed.
+      placeholder: "I'd like to see a new example that..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Would you be willing to contribute this?
+      options:
+        - label: "Yes, I'd like to open a PR for this"
+        - label: "No, I'm just suggesting the idea"

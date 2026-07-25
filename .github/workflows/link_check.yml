@@ -1,0 +1,50 @@
+name: Link Check
+
+on:
+  # Run weekly on Sundays at 00:00 UTC to catch broken links proactively
+  schedule:
+    - cron: "0 0 * * 0"
+
+  # Run on PRs that modify deepseek.md or README
+  pull_request:
+    branches: [main]
+    paths:
+      - "deepseek.md"
+      - "README.md"
+
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    name: Validate Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Validate links in deepseek.md
+        run: |
+          python scripts/validate_links.py \
+            --file deepseek.md \
+            --timeout 15 \
+            --delay 1.0
+
+      - name: Validate links in README.md
+        run: |
+          python scripts/validate_links.py \
+            --file README.md \
+            --timeout 15 \
+            --delay 1.0
+        # Don't fail the build for README links — they include
+        # placeholder URLs (YOUR_USERNAME) that are intentionally invalid.
+        continue-on-error: true
