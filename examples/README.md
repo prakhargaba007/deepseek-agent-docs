@@ -14,11 +14,11 @@ export DEEPSEEK_API_KEY="sk-your-key-here"
 
 | Folder | Language | Examples |
 |---|---|---|
-| [`python/`](python/) | Python + OpenAI SDK | 7 examples |
-| [`javascript/`](javascript/) | Node.js (ESM) | 3 examples |
-| [`typescript/`](typescript/) | TypeScript | 2 examples |
-| [`curl/`](curl/) | cURL (bash) | 3 examples |
-| [`anthropic_sdk/`](anthropic_sdk/) | Python + Anthropic SDK | 2 examples |
+| [`python/`](python/) | Python + OpenAI SDK | 8 examples (chat, streaming, thinking, tools, JSON, FIM, multi-turn, vision) |
+| [`javascript/`](javascript/) | Node.js (ESM) | 3 examples (chat, streaming, tools) |
+| [`typescript/`](typescript/) | TypeScript | 2 examples (chat, retry) |
+| [`curl/`](curl/) | cURL (bash) | 4 examples (chat, streaming, FIM, vision) |
+| [`anthropic_sdk/`](anthropic_sdk/) | Python + Anthropic SDK | 2 examples (chat, Claude Code setup) |
 
 ## Running Python Examples
 

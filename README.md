@@ -86,22 +86,24 @@ print(response.choices[0].message.content)
 
 | Section | Coverage |
 |---|---|
-| Models & Pricing | `deepseek-v4-pro`, `deepseek-v4-flash`, deprecation timeline, pricing table |
-| All Endpoints | Chat Completions, FIM (Beta), List Models, User Balance |
+| Models & Pricing | `deepseek-v4-pro` (GA), `deepseek-v4-flash` (GA), `deepseek-v4-flash-vision-exp` (Exp), Peak/Off-Peak pricing |
+| All Endpoints | Chat Completions, Files API (`/files`), FIM (Beta), List Models, User Balance |
 | Parameters | Every parameter with type, default, and behavior notes |
-| Thinking Mode | Toggle, `reasoning_effort`, `reasoning_content` multi-turn rules |
+| Thinking Mode | Toggle, `reasoning_effort` (`low`/`high`/`max`), `reasoning_content` multi-turn rules |
+| Vision / Multimodal | Image formats (JPEG/PNG/GIF/WebP), URL / base64 / Files API inputs, token calculation (capped 384 tokens/img) |
+| Files API | Upload, list, retrieve, and delete images for multi-turn chat completions |
 | Streaming | SSE format, usage stats in final chunk |
 | Tool Calling | Standard + strict mode, full JSON Schema reference |
 | JSON Output | `response_format`, required prompt patterns |
 | Context Caching | Cache hit rules, persistence timing, ~50× cost reduction |
 | FIM Completion | Fill-in-the-Middle for code, beta endpoint setup |
-| OpenAI Compat. | Migration steps, unsupported parameters, `extra_body` workaround |
+| OpenAI Compat. | Migration steps, unsupported parameters, `extra_body` workaround, Responses API |
 | Anthropic Compat. | Model mapping, SDK setup, Claude Code env vars |
 | Agent Integrations | Claude Code, GitHub Copilot, OpenCode configuration |
 | Rate Limits | Concurrency per model, `user_id` isolation |
 | Error Codes | All 7 codes with causes and solutions |
 | Best Practices | Production, prompt engineering, cost & latency optimization |
-| Hidden Edge Cases | 16 undocumented caveats and compatibility quirks |
+| Hidden Edge Cases | 20 undocumented caveats and compatibility quirks |
 
 ---
 
@@ -112,7 +114,7 @@ print(response.choices[0].message.content)
 Add to `.cursor/rules/deepseek.mdc`:
 ```
 Read deepseek.md before writing any DeepSeek API code.
-Use deepseek-v4-pro or deepseek-v4-flash. Never use deepseek-chat or deepseek-reasoner (deprecated).
+Use deepseek-v4-pro, deepseek-v4-flash, or deepseek-v4-flash-vision-exp. Never use deepseek-chat or deepseek-reasoner (retired).
 Pass thinking via extra_body={"thinking": {"type": "enabled"}} when using the OpenAI SDK.
 ```
 
@@ -146,12 +148,13 @@ Add to `CLAUDE.md`: `For DeepSeek API code, read deepseek.md first.`
 
 ## Supported Models
 
-| Model | Context | Max Output | Thinking | Pricing (input/output per 1M) |
-|---|---|---|---|---|
-| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ on by default | $0.435 / $0.87 (cache miss) |
-| `deepseek-v4-flash` | 1M tokens | 384K tokens | ✅ on by default | $0.14 / $0.28 (cache miss) |
+| Model | Context | Max Output | Thinking | Vision | Pricing (Off-Peak / Peak per 1M) | Status |
+|---|---|---|---|---|---|---|
+| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ on by default | ❌ | $0.2175 / $0.435 (input miss) | **GA** |
+| `deepseek-v4-flash` | 1M tokens | 384K tokens | ✅ on by default | ❌ | $0.07 / $0.14 (input miss) | **GA** |
+| `deepseek-v4-flash-vision-exp` | 1M tokens | 384K tokens | ✅ on by default | ✅ JPEG, PNG, GIF, WebP | $0.07 / $0.14 (input miss) | **Experimental** |
 
-> Cache hits are **~50× cheaper**. See [Section 6.6](deepseek.md#66-context-caching) for rules.
+> Cache hits are **~50× cheaper** ($0.007 / $0.0181 per 1M). See [Section 6.6](deepseek.md#66-context-caching) for caching rules.
 
 ---
 
@@ -187,8 +190,8 @@ deepseek-agent-docs/
 ├── SKILL.md             ← Agent skill definition (Cursor / OpenHands / Antigravity)
 ├── llms.txt             ← Standard llms.txt entry point
 │
-├── examples/            ← 17 runnable examples (Python, JS, TS, cURL, Anthropic)
-├── prompts/             ← 7 tool-specific agent prompts (Cursor, Claude Code, etc.)
+├── examples/            ← Runnable examples (Python, JS, TS, cURL, Anthropic)
+├── prompts/             ← 8 tool-specific agent prompts (Cursor, Claude Code, etc.)
 ├── scripts/             ← Maintenance scripts (link checker, formatter, ToC gen)
 └── .github/             ← Issue templates, PR template, Actions workflows
 ```
@@ -202,7 +205,7 @@ When DeepSeek releases new features:
 1. Check [api-docs.deepseek.com](https://api-docs.deepseek.com)
 2. Update `deepseek.md`
 3. Update `VERSION` and `CHANGELOG.md`
-4. Run `python scripts/validate_links.py` and `python scripts/check_formatting.py`
+4. Run `python scripts/check_formatting.py` and `python scripts/generate_toc.py --write`
 5. Open a PR — see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
@@ -211,7 +214,7 @@ When DeepSeek releases new features:
 
 Uses **Calendar Versioning** (`YYYY.MM.DD`) — the version number tells you when the docs were last synced, which is exactly what matters for a documentation project.
 
-Current: `2026.07.25` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/prakhargaba007/deepseek-agent-docs/releases)
+Current: `2026.09.02` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/prakhargaba007/deepseek-agent-docs/releases)
 
 ---
 

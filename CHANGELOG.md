@@ -26,6 +26,25 @@ and this project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD`).
 
 ---
 
+## [2026.09.02] — 2026-09-02
+
+### Added
+- **DeepSeek-V4-Flash-Vision-Exp Documentation**: Full documentation for the new experimental multimodal model supporting image and text inputs (JPEG, PNG, GIF, WebP).
+- **Files API Documentation (Section 4.5)**: Complete endpoint reference for `POST /files`, `GET /files`, `GET /files/{file_id}`, and `DELETE /files/{file_id}`.
+- **Multimodal & Vision Feature Guide (Section 6.9)**: Image input formats (URLs, base64 data URIs, `file_id`), token economics (capped at 384 tokens/image), and Python/cURL examples.
+- **Vision SDK Examples (Sections 13.9 & 13.10)**: Python and cURL examples for visual understanding and Files API lifecycle management.
+- **Peak and Off-Peak Pricing Documentation**: Documented 50% discount during off-peak windows and weekends.
+- **Flexible Reasoning Effort**: Documented `"low"`, `"high"`, and `"max"` reasoning effort settings for V4 models.
+- **OpenAI Responses API**: Documented native compatibility with OpenAI Responses API.
+
+### Changed
+- Updated `deepseek-v4-pro` status to General Availability (GA).
+- Updated `deepseek-chat` and `deepseek-reasoner` status to permanently retired (discontinued July 24, 2026).
+- Updated formatting validation script to correctly handle code block content.
+- Auto-regenerated Table of Contents across `deepseek.md`.
+
+---
+
 ## [2026.07.25] — 2026-07-25
 
 ### Added
@@ -61,9 +80,12 @@ and this project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD`).
 
 | Version | Date | Summary |
 |---|---|---|
+| [2026.09.02] | 2026-09-02 | Added DeepSeek-V4-Flash-Vision-Exp, Files API, GA status, and Peak/Off-Peak pricing |
 | [2026.07.25] | 2026-07-25 | Initial public release |
 
 ---
 
-[Unreleased]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.07.25...HEAD
+[Unreleased]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.09.02...HEAD
+[2026.09.02]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.07.25...v2026.09.02
 [2026.07.25]: https://github.com/prakhargaba007/deepseek-agent-docs/releases/tag/v2026.07.25
+

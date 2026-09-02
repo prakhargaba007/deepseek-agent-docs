@@ -27,11 +27,19 @@ DEFAULT_FILE = REPO_ROOT / "deepseek.md"
 # ── Checks ────────────────────────────────────────────────────────────────────
 
 def check_heading_hierarchy(lines: list[str]) -> list[str]:
-    """Detect skipped heading levels (e.g., H1 → H3 without H2)."""
+    """Detect skipped heading levels (e.g., H1 → H3 without H2), ignoring code blocks."""
     errors = []
     prev_level = 0
+    in_block = False
 
     for lineno, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_block = not in_block
+            continue
+        if in_block:
+            continue
+
         match = re.match(r'^(#{1,6})\s+', line)
         if not match:
             continue
@@ -46,11 +54,19 @@ def check_heading_hierarchy(lines: list[str]) -> list[str]:
 
 
 def check_no_duplicate_headings(lines: list[str]) -> list[str]:
-    """Detect duplicate heading text."""
+    """Detect duplicate heading text, ignoring code blocks."""
     errors = []
     seen: dict[str, int] = {}
+    in_block = False
 
     for lineno, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_block = not in_block
+            continue
+        if in_block:
+            continue
+
         match = re.match(r'^#{1,6}\s+(.+)', line)
         if not match:
             continue
