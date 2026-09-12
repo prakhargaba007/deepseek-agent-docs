@@ -2,7 +2,7 @@
 
 > **Based on official documentation at [api-docs.deepseek.com](https://api-docs.deepseek.com)**
 >
-> Version: 1.1.0 | Last updated: September 2026
+> Version: 1.2.0 | Last updated: September 2026
 
 ---
 
@@ -48,6 +48,12 @@
     - [4.5.2 List Files](#452-list-files)
     - [4.5.3 Retrieve File Info](#453-retrieve-file-info)
     - [4.5.4 Delete File](#454-delete-file)
+  - [4.6 Responses API](#46-responses-api)
+    - [Request Body (Responses API)](#request-body-responses-api)
+    - [Input Item Types (Responses API)](#input-item-types-responses-api)
+    - [`input_image` Content Part Fields](#input_image-content-part-fields)
+    - [Example Request (Responses API cURL)](#example-request-responses-api-curl)
+    - [Example Response (Responses API)](#example-response-responses-api)
 - [5. Parameters Reference](#5-parameters-reference)
   - [`messages` (array, required)](#messages-array-required)
   - [`model` (string, required)](#model-string-required)
@@ -80,6 +86,7 @@
     - [Non-thinking Mode](#non-thinking-mode)
     - [Thinking Mode with Tool Calls](#thinking-mode-with-tool-calls)
     - [strict Mode (Beta)](#strict-mode-beta)
+    - [Inserting Tool Calls Mid-Conversation](#inserting-tool-calls-mid-conversation)
   - [6.5 JSON Output (Structured Output)](#65-json-output-structured-output)
   - [6.6 Context Caching](#66-context-caching)
     - [Cache Persistence and Hit Rules](#cache-persistence-and-hit-rules)
@@ -87,7 +94,8 @@
     - [Cost Implications](#cost-implications)
   - [6.7 Chat Prefix Completion (Beta)](#67-chat-prefix-completion-beta)
   - [6.8 FIM (Fill-in-the-Middle)](#68-fim-fill-in-the-middle)
-  - [6.9 Vision / Multimodal (Beta / Exp)](#69-vision-multimodal-beta-exp)
+  - [6.9 Vision / Multimodal (GA)](#69-vision-multimodal-ga)
+    - [Detail Level](#detail-level)
     - [Input Formats](#input-formats)
     - [Python Example (Vision Analysis)](#python-example-vision-analysis)
 - [7. OpenAI Compatibility](#7-openai-compatibility)
@@ -106,9 +114,12 @@
   - [Claude Code](#claude-code)
   - [GitHub Copilot](#github-copilot)
   - [OpenCode](#opencode)
+  - [OpenClaw](#openclaw)
+  - [OpenAI Codex & Responses API Agents](#openai-codex-responses-api-agents)
 - [10. Rate Limits & Isolation](#10-rate-limits-isolation)
   - [Concurrency Limits](#concurrency-limits)
   - [user_id Isolation](#user_id-isolation)
+  - [Request Keep-Alive Mechanism](#request-keep-alive-mechanism)
 - [11. Error Codes & Handling](#11-error-codes-handling)
   - [Error Reference](#error-reference)
   - [Retry Strategy](#retry-strategy)
@@ -128,6 +139,7 @@
   - [13.8 Multi-turn Conversation (Python)](#138-multi-turn-conversation-python)
   - [13.9 Vision / Multimodal Image Analysis (Python)](#139-vision-multimodal-image-analysis-python)
   - [13.10 Files API Upload and Multi-turn Reference (cURL + Python)](#1310-files-api-upload-and-multi-turn-reference-curl-python)
+  - [13.11 Responses API Multi-turn Agent (Python)](#1311-responses-api-multi-turn-agent-python)
 - [14. Best Practices](#14-best-practices)
   - [Production Deployment](#production-deployment)
   - [Prompt Engineering](#prompt-engineering)
@@ -144,6 +156,7 @@
   - [15.5 Streaming UI (FastAPI + SSE)](#155-streaming-ui-fastapi-sse)
   - [15.6 JSON Data Extraction Pipeline](#156-json-data-extraction-pipeline)
 - [16. Changelog](#16-changelog)
+  - [2026-09-10 — DeepSeek-V4.1-Flash Release, Lower Pricing & Responses API](#2026-09-10-deepseek-v41-flash-release-lower-pricing-responses-api)
   - [2026-08-21 — DeepSeek-V4-Flash-Vision-Exp & Files API](#2026-08-21-deepseek-v4-flash-vision-exp-files-api)
   - [2026-08-13 — DeepSeek-V4-Pro GA & Flexible Reasoning Effort](#2026-08-13-deepseek-v4-pro-ga-flexible-reasoning-effort)
   - [2026-07-24 — Legacy Models Retired](#2026-07-24-legacy-models-retired)
@@ -169,9 +182,10 @@ The DeepSeek API provides access to the DeepSeek family of large language models
 
 ### Base URLs
 
-| Parameter | Value |
+| Protocol / API Format | Base URL / Endpoint |
 |---|---|
-| base_url (OpenAI format) | `https://api.deepseek.com` |
+| base_url (OpenAI Chat Completions) | `https://api.deepseek.com` |
+| Responses API (OpenAI format) | `https://api.deepseek.com` (`POST /responses`) |
 | base_url (Anthropic format) | `https://api.deepseek.com/anthropic` |
 | Beta features base_url | `https://api.deepseek.com/beta` |
 
@@ -179,7 +193,7 @@ The DeepSeek API provides access to the DeepSeek family of large language models
 
 A minimal chat completion request requires:
 - A valid API key
-- A model name
+- A model name (`deepseek-flash` or `deepseek-v4-pro`)
 - A list of messages
 
 ### Your First API Call (cURL)
@@ -189,7 +203,7 @@ curl https://api.deepseek.com/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
   -d '{
-        "model": "deepseek-v4-pro",
+        "model": "deepseek-flash",
         "messages": [
           {"role": "system", "content": "You are a helpful assistant."},
           {"role": "user", "content": "Hello!"}
@@ -212,7 +226,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="deepseek-v4-pro",
+    model="deepseek-flash",
     messages=[
         {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": "Hello"}
@@ -238,7 +252,7 @@ const client = new OpenAI({
 
 async function main() {
     const response = await client.chat.completions.create({
-        model: "deepseek-v4-pro",
+        model: "deepseek-flash",
         messages: [
             { role: "system", content: "You are a helpful assistant" },
             { role: "user", content: "Hello" },
@@ -283,63 +297,57 @@ The DeepSeek API uses Bearer token authentication via HTTP headers.
 
 | Model | Context Length | Max Output | Thinking Support | Vision Support | Tool Support | Streaming | Status | Recommended For |
 |---|---|---|---|---|---|---|---|---|
-| `deepseek-v4-pro` | 1M tokens | 384K tokens | Yes (default: enabled) | No | Yes | Yes | **GA** | Complex reasoning, coding, agent tasks, production workloads |
-| `deepseek-v4-flash` | 1M tokens | 384K tokens | Yes (default: enabled) | No | Yes | Yes | **GA** | Fast responses, simple agent tasks, cost-sensitive applications |
-| `deepseek-v4-flash-vision-exp` | 1M tokens | 384K tokens | Yes (default: enabled) | **Yes** (JPEG, PNG, GIF, WebP) | Yes | Yes | **Experimental** | Multimodal tasks, visual QA, OCR, chart analysis, vision agents |
+| `deepseek-flash` | 1M tokens | 384K tokens | Yes (default: enabled) | **Yes** (JPEG, PNG, GIF, WebP) | Yes | Yes | **GA** | High-throughput, fast coding, vision, agent workflows, cost-sensitive production |
+| `deepseek-v4-pro` | 1M tokens | 384K tokens | Yes (default: enabled) | No | Yes | Yes | **GA** | Complex reasoning, difficult proofs, deep agent workflows |
 
 ### Model Details
 
-**DeepSeek-V4-Pro (General Availability — August 13, 2026)**
+**DeepSeek-V4.1-Flash (Model: `deepseek-flash` — Released September 10, 2026)**
+- 552B total parameters, MoE architecture
+- Novel asymmetric Causal Encoder–Decoder architecture: only 8B active parameters for input processing, 16B active parameters for output generation
+- Native multimodal visual understanding (JPEG, PNG, GIF, WebP) directly integrated into the core model
+- Drastically compressed KV cache: requires only **1/4 the HBM** and **1/8 the SSD storage** compared to previous generations, drastically reducing cache-hit costs for multi-turn agent tasks
+- Benchmark performance exceeds previous generation flagships, including V4-Pro across math, coding, and agent evaluations (GPQA Diamond: 90.9, Codeforces: 3471, Terminal-Bench 2.1: 90.6, DeepSWE: 74.2)
+- Concurrency limit: **2,500** concurrent requests
+- Supports flexible reasoning effort: `low`, `high` (default), `max`
+
+**DeepSeek-V4-Pro (Model: `deepseek-v4-pro` — DeepSeek-V4-Pro-0813)**
 - 1.6T total parameters, 49B active parameters (MoE)
-- Performance rivaling top frontier models
-- Enhanced agentic capabilities and rich world knowledge
-- World-class reasoning in Math, STEM, and Coding
-- Supports flexible reasoning effort: `low`, `high`, `max`
-
-**DeepSeek-V4-Flash (General Availability)**
-- 284B total parameters, 13B active parameters (MoE)
-- Reasoning capabilities closely approach V4-Pro
-- Performs on par with V4-Pro on everyday agent and workflow tasks
-- Smaller parameter size, faster response times, highly cost-effective
-- Supports flexible reasoning effort: `low`, `high`, `max`
-
-**DeepSeek-V4-Flash-Vision-Exp (Experimental — Released August 21, 2026)**
-- Multimodal variant of DeepSeek-V4-Flash supporting image and text inputs
-- 1M token context window and 384K maximum output tokens
-- High-fidelity visual understanding, document parsing, diagram comprehension, and UI perception
-- Supports image inputs via external URL, base64 data URI, or Files API (`file_id`)
-- Token conversion: Images billed as standard input tokens, capped at **384 tokens per image**
-- Priced identically to `deepseek-v4-flash` with zero image surcharge
+- Frontier-grade performance in deep STEM proofs, multi-step math, and complex code synthesis
+- In response to strong user demand, API services for DeepSeek-V4-Pro are maintained beyond September 14, 2026 with billing method unchanged
+- Concurrency limit: **500** concurrent requests
+- Note: Vision is **not supported** on `deepseek-v4-pro` (use `deepseek-flash` for multimodal tasks)
 
 ### Retired Legacy Models
 
-> **Notice**: The legacy model names `deepseek-chat` and `deepseek-reasoner` were officially discontinued on **2026-07-24 15:59 UTC**.
-> Migrate all workloads to `deepseek-v4-flash` or `deepseek-v4-pro`.
+- **`deepseek-v4-flash` & `deepseek-v4-flash-vision-exp`**: Officially retired on **September 10, 2026**. For backward compatibility, requests specifying `deepseek-v4-flash` or `deepseek-v4-flash-vision-exp` are automatically routed to `deepseek-flash` (DeepSeek-V4.1-Flash) and billed at Flash rates.
+- **`deepseek-chat` & `deepseek-reasoner`**: Permanently retired on **July 24, 2026 15:59 UTC**.
 
 ### Pricing (Per 1M Tokens)
 
-DeepSeek uses **Peak** and **Off-Peak** pricing schedules (effective August 16, 2026). Off-peak pricing offers an automatic **50% discount**.
+DeepSeek operates on a **Peak** and **Off-Peak** pricing schedule. Off-peak pricing provides an automatic **50% discount**.
+*Pricing update effective 04:00 UTC on September 10, 2026.*
 
 - **Peak Hours**: 01:00–04:00 UTC and 06:00–10:00 UTC, Monday through Friday
 - **Off-Peak Hours**: All other times (including all weekend hours)
 
 | Model | Token Type | Off-Peak (per 1M) | Peak (per 1M) | Concurrency Limit |
 |---|---|---|---|---|
-| **deepseek-v4-flash** / **v4-flash-vision-exp** | Input (Cache Hit) | **$0.007** | $0.014 | 2500 |
-| | Input (Cache Miss) | **$0.07** | $0.14 | 2500 |
-| | Output | **$0.14** | $0.28 | 2500 |
-| **deepseek-v4-pro** | Input (Cache Hit) | **$0.0181** | $0.03625 | 500 |
-| | Input (Cache Miss) | **$0.2175** | $0.435 | 500 |
-| | Output | **$0.435** | $0.87 | 500 |
+| **deepseek-flash**<br>*(and aliases `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`)* | Input (Cache Hit) | **$0.003** | $0.006 | 2500 |
+| | Input (Cache Miss) | **$0.15** | $0.30 | 2500 |
+| | Output | **$0.60** | $1.20 | 2500 |
+| **deepseek-v4-pro** | Input (Cache Hit) | **$0.022** | $0.044 | 500 |
+| | Input (Cache Miss) | **$0.66** | $1.32 | 500 |
+| | Output | **$1.98** | $3.96 | 500 |
 
-*Note: For `deepseek-v4-flash-vision-exp`, images are billed as standard input tokens (max 384 tokens per image). Files API storage is free.*
+*Note: For `deepseek-flash`, image inputs are dynamically converted into tokens (capped at 1,024 tokens per image) and billed at standard input rates. Files API storage and upload are free.*
 
 ### Deduction Rules
 
 - Expense = number of tokens × applicable price
 - Fees are deducted from your topped-up balance or granted balance
 - Granted balance is consumed first when both balances are available
-- Prices may vary; DeepSeek reserves the right to adjust them
+- Product prices may vary; DeepSeek reserves the right to adjust them
 - Check the DeepSeek Platform dashboard for live consumption reports
 
 ---
@@ -363,20 +371,20 @@ DeepSeek uses **Peak** and **Off-Peak** pricing schedules (effective August 16, 
 
 | Parameter | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `messages` | array[object] | Yes | - | A list of messages comprising the conversation. Minimum 1 message. Supports text and image content blocks. |
-| `model` | string | Yes | - | Model ID: `deepseek-v4-pro`, `deepseek-v4-flash`, or `deepseek-v4-flash-vision-exp` |
+| `messages` | array[object] | Yes | - | A list of messages comprising the conversation. Minimum 1 message. Supports text, image, and file content blocks. |
+| `model` | string | Yes | - | Model ID: `deepseek-flash` (recommended) or `deepseek-v4-pro` (aliases `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` route to `deepseek-flash`) |
 | `thinking` | object | No | `{"type": "enabled"}` | Controls thinking mode. `{"type": "enabled"}` or `{"type": "disabled"}` |
 | `reasoning_effort` | string | No | `"high"` | Reasoning effort: `"low"`, `"high"`, or `"max"` |
 | `max_tokens` | integer | No | - | Maximum tokens in the generated response |
-| `temperature` | number | No | - | Sampling temperature (not supported in thinking mode) |
-| `top_p` | number | No | - | Nucleus sampling parameter (not supported in thinking mode) |
+| `temperature` | number | No | - | Sampling temperature (not supported in thinking mode; range [0.0, 2.0] in non-thinking mode) |
+| `top_p` | number | No | - | Nucleus sampling parameter (takes effect in thinking mode with lower bound `0.95`; fixed at `1.0` in non-thinking mode) |
 | `stream` | boolean | No | `false` | Whether to stream partial progress |
 | `stream_options` | object | No | - | Options for streaming. Set `{"include_usage": true}` to get token stats in the final chunk |
 | `stop` | string or array[string] | No | - | Up to 16 sequences where the API will stop generating |
 | `tools` | array[object] | No | - | Tool definitions (functions the model may call) |
 | `tool_choice` | string or object | No | - | Controls tool calling behavior (`auto`, `none`, `required`, or specific tool) |
 | `response_format` | object | No | - | For structured JSON output: `{"type": "json_object"}` |
-| `user` | string | No | - | Unique user ID for rate limit isolation and safety tracking |
+| `user` | string | No | - | Unique user ID (`[a-zA-Z0-9\-_]+`, max 512 chars) for rate limit isolation and safety tracking |
 | `frequency_penalty` | - | - | - | **Deprecated.** Will not take effect. |
 | `presence_penalty` | - | - | - | **Deprecated.** Will not take effect. |
 
@@ -402,7 +410,7 @@ Standard text user message:
 }
 ```
 
-Multimodal user message (for `deepseek-v4-flash-vision-exp`):
+Multimodal user message (supported on `deepseek-flash`):
 ```json
 {
   "role": "user",
@@ -414,14 +422,18 @@ Multimodal user message (for `deepseek-v4-flash-vision-exp`):
     {
       "type": "image_url",
       "image_url": {
-        "url": "https://example.com/diagram.png"
+        "url": "https://example.com/diagram.png",
+        "detail": "low"
       }
     }
   ]
 }
 ```
 
-Image URL can also be a base64 data URI (`"data:image/png;base64,..."`) or a file reference uploaded via the Files API (`"file_id:file-api-1234567890"`).
+Image inputs can be provided in three ways on `deepseek-flash`:
+1. **External public URL**: `{"type": "image_url", "image_url": {"url": "https://...", "detail": "low"}}`
+2. **Base64 data URL**: `{"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}`
+3. **Files API reference**: `{"type": "file", "file_id": "file-api-abcdef1234567890"}` (or inline base64 `{"type": "file", "file_data": "data:image/png;base64,...", "filename": "diagram.png"}`)
 
 **Assistant Message**
 ```json
@@ -732,9 +744,10 @@ The DeepSeek Files API allows you to upload, list, retrieve, and delete files (p
 | Content-Type | `multipart/form-data` |
 
 **Form Parameters:**
-- `file`: The file binary data to upload (JPEG, PNG, GIF, WebP). Maximum size: **64 MiB**. Upload must finish within 10 minutes.
-- `purpose`: Purpose of the file. Currently only `"user_data"` is supported.
-- `expires_in` *(optional)*: Expiration time in seconds (integer between 3600 and 2,592,000, i.e., 1 hour to 30 days). If omitted, the file is retained indefinitely.
+- `file`: The image file binary data to upload (JPEG, PNG, GIF, WebP). Maximum size: **64 MiB**. Upload must complete within 10 minutes.
+- `purpose`: Purpose of the file. Must be `"user_data"`.
+- `expires_after[anchor]` *(optional)*: Must be `"created_at"` if provided. Required together with `expires_after[seconds]`.
+- `expires_after[seconds]` *(optional)*: Lifetime in seconds, between 3600 and 2,592,000 (1 hour to 30 days). If both `expires_after` fields are omitted, the file is retained permanently.
 
 **Response Schema:**
 ```json
@@ -745,7 +758,7 @@ The DeepSeek Files API allows you to upload, list, retrieve, and delete files (p
   "created_at": 1728000000,
   "filename": "diagram.png",
   "purpose": "user_data",
-  "status": "processed"
+  "expires_at": 1728086400
 }
 ```
 
@@ -755,7 +768,8 @@ curl https://api.deepseek.com/files \
   -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
   -F "file=@/path/to/diagram.png" \
   -F "purpose=user_data" \
-  -F "expires_in=86400"
+  -F "expires_after[anchor]=created_at" \
+  -F "expires_after[seconds]=86400"
 ```
 
 #### 4.5.2 List Files
@@ -769,7 +783,8 @@ curl https://api.deepseek.com/files \
 **Query Parameters:**
 - `after` *(optional)*: Cursor identifier for pagination.
 - `limit` *(optional)*: Number of files to return (1–1000, default: 20).
-- `order` *(optional)*: Sort order (`asc` or `desc`, default: `desc`).
+- `order` *(optional)*: Sort order (`asc` or `desc`, default: `asc`).
+- `purpose` *(optional)*: Filter by purpose (`user_data`).
 
 **Example Request:**
 ```bash
@@ -816,6 +831,119 @@ curl -X DELETE https://api.deepseek.com/files/file-api-abcdef1234567890 \
 
 ---
 
+### 4.6 Responses API
+
+**Create Model Response**
+
+| Property | Value |
+|---|---|
+| HTTP Method | `POST` |
+| URL | `/responses` |
+| Base URL | `https://api.deepseek.com` |
+| Authentication | Bearer token via `Authorization: Bearer ${DEEPSEEK_API_KEY}` |
+| Content-Type | `application/json` |
+
+**Purpose**: Creates a model response using the OpenAI Responses API format (`/responses`). Designed for modern AI coding agents (such as Codex, OpenCode, and OpenClaw), supporting the custom `apply_patch` tool, mid-conversation tool insertions, native vision via `input_image`, and thinking mode effort controls.
+
+> **Stateless Architecture**: The API is completely stateless — responses and conversations are not stored on DeepSeek servers (`store: false`, `previous_response_id: null`, `conversation: null`). For multi-turn conversations, the client provides the full conversation history in the `input` array on every request.
+
+#### Request Body (Responses API)
+
+| Parameter | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `model` | string | Yes | - | `deepseek-flash` (recommended) or `deepseek-v4-pro` |
+| `input` | string or array[object] | Optional* | - | String prompt or array of input items (`message`, `function_call`, `function_call_output`, `custom_tool_call`, `custom_tool_call_output`, `reasoning`). *At least one of `input` or `instructions` is required. |
+| `instructions` | string | Optional* | - | System instructions inserted as the initial system message |
+| `stream` | boolean | No | `false` | When `true`, streams Server-Sent Events (SSE) |
+| `reasoning` | object | No | `{"effort": "high"}` | Thinking configuration: `{"effort": "none"}` (disables thinking), `"low"`, `"high"`, or `"max"` |
+| `tools` | array[object] | No | - | Tools list. Supports standard `function` and the custom tool `{"type": "custom", "name": "apply_patch"}` |
+| `tool_choice` | string or object | No | `"auto"` | `"auto"`, `"none"`, `"required"`, or specific function object |
+| `max_output_tokens` | integer | No | - | Maximum tokens in the generated response |
+| `temperature` | number | No | `1.0` | Sampling temperature [0.0, 2.0]. Has no effect in thinking mode |
+| `top_p` | number | No | `1.0` | Enforced with a lower bound of `0.95` in thinking mode; fixed at `1.0` in non-thinking mode |
+| `top_logprobs` | integer | No | - | Number of top log probabilities to return (range 0–20) |
+| `text` | object | No | - | Structured output config: `{"format": {"type": "json_object"}}` |
+| `user` | string | No | - | Unique user ID (`[a-zA-Z0-9\-_]+`, max 512 chars) for concurrency limits and isolation |
+
+#### Input Item Types (Responses API)
+
+| Item Type | Role / Fields | Description |
+|---|---|---|
+| `message` | `role`: `user`, `assistant`, `system`, `developer` (`developer` treated as `user`) | Standard message. `content` can be a plain string or array of parts (`input_text`, `output_text`, `input_image`). |
+| `function_call` | `call_id`, `name`, `arguments` | Assistant function call. Merged into adjacent assistant turn. |
+| `function_call_output` | `call_id`, `output` | Output of a function call. `output` can be a string or array including `input_image`. |
+| `custom_tool_call` | `call_id`, `name: "apply_patch"`, `arguments` | Custom tool invocation for agent patch application (Codex format). |
+| `custom_tool_call_output` | `call_id`, `output` | Output of the patch execution. Can include text and `input_image`. |
+| `reasoning` | `content` | Chain-of-thought tokens from previous assistant turns. Merged into adjacent assistant message. |
+
+#### `input_image` Content Part Fields
+
+Supported in `user` / `developer` messages and in `function_call_output` / `custom_tool_call_output` items:
+- `type`: `"input_image"`
+- `image_url`: An `http(s)` URL (max 8,192 chars) or base64 data URL (`data:image/jpeg;base64,...`). Supported: JPEG, PNG, GIF, WebP. Mutually exclusive with `file_id`.
+- `file_id`: ID of a file uploaded via Files API (`file-api-...`). Mutually exclusive with `image_url`.
+- `detail`: `"low"` (downscaled to 512×512), `"high"`, `"original"`, `"auto"` (default). Ignored when `file_id` is passed.
+
+#### Example Request (Responses API cURL)
+
+```bash
+curl https://api.deepseek.com/responses \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
+  -d '{
+        "model": "deepseek-flash",
+        "instructions": "You are a code refactoring assistant.",
+        "input": [
+          {
+            "role": "user",
+            "content": [
+              {"type": "input_text", "text": "Inspect this diagram and optimize the function."},
+              {"type": "input_image", "image_url": "https://example.com/flowchart.png", "detail": "low"}
+            ]
+          }
+        ],
+        "reasoning": {"effort": "high"}
+      }'
+```
+
+#### Example Response (Responses API)
+
+```json
+{
+  "id": "resp-abcdef1234567890",
+  "object": "response",
+  "created_at": 1728000000,
+  "model": "deepseek-flash",
+  "status": "completed",
+  "output": [
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Based on the flowchart, the logic can be simplified as follows..."
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 1024,
+    "output_tokens": 312,
+    "total_tokens": 1336,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens_details": {
+      "reasoning_tokens": 210
+    }
+  },
+  "store": false
+}
+```
+
+---
+
 ## 5. Parameters Reference
 
 ### `messages` (array, required)
@@ -824,9 +952,10 @@ A list of messages comprising the conversation. Minimum 1 message. Each message 
 
 **Content types:**
 - **Text content**: A standard string: `"content": "Hello, world!"`
-- **Multimodal content**: An array of content objects for `deepseek-v4-flash-vision-exp`:
+- **Multimodal content**: An array of content objects for `deepseek-flash`:
   - `{"type": "text", "text": "Describe this image"}`
-  - `{"type": "image_url", "image_url": {"url": "https://example.com/image.png"}}` (supports public URLs, base64 data URIs, or `file_id:file-api-...` references)
+  - `{"type": "image_url", "image_url": {"url": "https://example.com/image.png", "detail": "low"}}` (public URL or base64 data URI)
+  - `{"type": "file", "file_id": "file-api-abcdef1234567890"}` (Files API upload reference)
 
 **Interaction with other parameters:**
 - When the last message has `role: "assistant"` and `prefix: true`, the model completes from that prefix (requires `base_url="https://api.deepseek.com/beta"`)
@@ -835,15 +964,14 @@ A list of messages comprising the conversation. Minimum 1 message. Each message 
 ### `model` (string, required)
 
 Valid values:
-- `deepseek-v4-pro` — Frontier-class reasoning, coding, and production agent workflows
-- `deepseek-v4-flash` — High-speed, economical, general-purpose text and reasoning
-- `deepseek-v4-flash-vision-exp` — Multimodal vision model (text + images)
+- `deepseek-flash` — Primary model serving DeepSeek-V4.1-Flash. High-speed, economical, native multimodal vision, 2,500 concurrency limit. Legacy aliases `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` route here.
+- `deepseek-v4-pro` — Frontier-class reasoning, coding, and production agent workflows (DeepSeek-V4-Pro-0813), 500 concurrency limit. Does not support vision.
 
 The model determines capabilities, pricing tier, and concurrency limits.
 
 ### `thinking` (object, optional)
 
-Controls the thinking mode toggle.
+Controls the thinking mode toggle in Chat Completions.
 
 ```json
 {"type": "enabled"}   // thinking mode (default)
@@ -864,8 +992,8 @@ Controls the reasoning effort when thinking mode is enabled.
 | `"low"` | Minimal reasoning overhead; fastest response times with basic chain-of-thought |
 | `"high"` | Standard reasoning effort (default) for general STEM, code, and analytical questions |
 | `"max"` | Deepest reasoning exploration for complex multi-step reasoning, agents, and difficult proofs |
-| `"medium"` | Mapped to `"high"` for OpenAI API compatibility |
-| `"xhigh"` | Mapped to `"max"` for OpenAI API compatibility |
+
+*(For compatibility: `"minimal"` maps to `"low"`; `"medium"` and `"xhigh"` map to `"high"`; `"ultra"` maps to `"max"`).*
 
 ### `max_tokens` (integer, optional)
 
@@ -873,11 +1001,13 @@ The maximum number of tokens that can be generated in the response.
 
 ### `temperature` (number, optional)
 
-Sampling temperature. **Not supported in thinking mode** — setting it will have no effect but will not trigger an error.
+Sampling temperature (range 0.0 to 2.0). **Not supported in thinking mode** — setting it will have no effect but will not trigger an error.
 
 ### `top_p` (number, optional)
 
-Nucleus sampling parameter. **Not supported in thinking mode** — same behavior as temperature.
+Nucleus sampling parameter.
+- **In thinking mode**: Takes effect with a **lower bound of 0.95**. Any value below 0.95 is automatically raised to 0.95.
+- **In non-thinking mode**: Fixed at `1.0`; any user-supplied value is ignored.
 
 ### `presence_penalty` / `frequency_penalty` (number, optional)
 
@@ -912,7 +1042,7 @@ For JSON output: `{"type": "json_object"}`. When enabled, the prompt must includ
 
 ### `user` (string, optional)
 
-A user_id for fine-grained management of different users under the same account. Used for:
+A user_id string matching `[a-zA-Z0-9\-_]+` (maximum length 512 characters) for fine-grained management of different users under the same account. Used for:
 - Content safety isolation
 - KVCache isolation
 - Scheduling isolation
@@ -938,26 +1068,35 @@ A user_id for fine-grained management of different users under the same account.
 
 #### Control Parameters
 
-| Control | OpenAI Format | Anthropic Format |
-|---|---|---|
-| Toggle | `"thinking": {"type": "enabled/disabled"}` | Same (via extra_body) |
-| Effort | `"reasoning_effort": "high/max"` | `"output_config": {"effort": "high/max"}` |
+| Control | OpenAI Format (Chat Completions) | Anthropic Format (`/messages`) | Responses API (`/responses`) |
+|---|---|---|---|
+| Toggle | `"thinking": {"type": "enabled/disabled"}` | `{"reasoning": {"effort": "none/low/high/max"}}` (`none` disables) | `{"reasoning": {"effort": "none/low/high/max"}}` (`none` disables) |
+| Effort | `"reasoning_effort": "low/high/max"` | `{"output_config": {"effort": "low/high/max"}}` | `{"reasoning": {"effort": "low/high/max"}}` |
+
+Thinking mode is **enabled by default** across all V4 and V4.1 models, with the default effort being `high`.
+
+**Reasoning Effort Mapping:**
+| Requested Effort | Actual Mapped Effort |
+|---|---|
+| `minimal` | `low` |
+| `low` | `low` |
+| `medium` | `high` |
+| `high` (default) | `high` |
+| `xhigh` | `high` |
+| `max` | `max` |
+| `ultra` | `max` |
 
 #### Input and Output Parameters
 
-In thinking mode, the following parameters are **not supported** (they have no effect but will not error):
-- `temperature`
-- `top_p`
-- `presence_penalty`
-- `frequency_penalty`
-
-The chain-of-thought content is returned via the **`reasoning_content`** parameter, at the same level as `content` in the response message.
+In thinking mode:
+- `temperature`, `presence_penalty`, and `frequency_penalty` have no effect (silently ignored for compatibility).
+- `top_p` takes effect with a **lower bound of 0.95** (values below 0.95 are clamped to 0.95). In non-thinking mode, `top_p` is fixed at 1.0.
+- The chain-of-thought content is returned via the **`reasoning_content`** parameter, at the same level as `content` in the response message.
 
 #### Multi-turn Behavior with reasoning_content
 
-**Without tool calls**: The intermediate assistant's `reasoning_content` does NOT need to participate in context concatenation. If passed to the API in subsequent turns, it will be ignored.
-
-**With tool calls**: The intermediate assistant's `reasoning_content` MUST participate in context concatenation and MUST be passed back to the API in all subsequent user interaction turns.
+- **When the request carries the `tools` parameter**: The `reasoning_content` of all previous turns **must** be passed back to the API and will be concatenated into the model context.
+- **When the request does NOT carry the `tools` parameter**: `reasoning_content` does not need to be passed back; even if sent to the API, it is automatically ignored and not concatenated into context.
 
 #### Example (Non-streaming with Thinking)
 
@@ -1324,6 +1463,12 @@ From DeepSeek-V3.2 onward, tool use is supported in thinking mode. When a tool c
 }
 ```
 
+#### Inserting Tool Calls Mid-Conversation
+
+In complex agent workflows, clients may need to dynamically insert tool calls that were not produced by the model (together with their execution outputs) into the conversation history:
+- **Anthropic API (`/messages`) and Responses API (`/responses`)**: Fully support inserting synthetic/client-side tool call messages and tool outputs mid-conversation, as well as inserting system messages mid-conversation.
+- **Chat Completions API (`/chat/completions`)**: Does **not** support inserting tool calls mid-conversation (it only supports inserting system messages mid-conversation). For agents requiring mid-conversation tool injection, use the Anthropic API or Responses API format.
+
 ---
 
 ### 6.5 JSON Output (Structured Output)
@@ -1420,10 +1565,12 @@ The response includes cache metrics:
 
 #### Cost Implications
 
-| | Cache Hit (Off-Peak / Peak) | Cache Miss (Off-Peak / Peak) |
+With DeepSeek-V4.1-Flash, the KV cache footprint has been reduced to **1/4 the HBM** and **1/8 the SSD storage** compared to previous generations, significantly lowering infrastructure overhead and cache costs for agentic workloads.
+
+| Model | Cache Hit (Off-Peak / Peak) | Cache Miss (Off-Peak / Peak) |
 |---|---|---|
-| deepseek-v4-flash input | $0.007 / $0.014 per 1M | $0.07 / $0.14 per 1M |
-| deepseek-v4-pro input | $0.0181 / $0.03625 per 1M | $0.2175 / $0.435 per 1M |
+| `deepseek-flash` input | $0.003 / $0.006 per 1M | $0.15 / $0.30 per 1M |
+| `deepseek-v4-pro` input | $0.022 / $0.044 per 1M | $0.66 / $1.32 per 1M |
 
 Cache hits offer approximately **50x** cost reduction for input tokens.
 
@@ -1451,7 +1598,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="deepseek-v4-pro",
+    model="deepseek-flash",
     messages=[
         {"role": "user", "content": "Write a Python function to calculate fibonacci numbers"},
         {"role": "assistant", "content": "```python\n", "prefix": True}
@@ -1484,7 +1631,7 @@ client = OpenAI(
 )
 
 response = client.completions.create(
-    model="deepseek-v4-pro",
+    model="deepseek-flash",
     prompt="def fibonacci(n):\n    ",
     suffix="\n    return result",
     max_tokens=128
@@ -1496,20 +1643,31 @@ response = client.completions.create(
 
 ---
 
-### 6.9 Vision / Multimodal (Beta / Exp)
+### 6.9 Vision / Multimodal (GA)
 
-**What it does**: Enables multimodal understanding of images alongside text queries using `deepseek-v4-flash-vision-exp`.
+**What it does**: Enables multimodal understanding of images alongside text queries natively using `deepseek-flash` (DeepSeek-V4.1-Flash).
 
 **Why it exists**: Supports visual document understanding, OCR, architecture diagram analysis, chart reading, screenshot inspection, and visual reasoning in AI coding agents.
 
 **Key Specifications & Rules:**
-- **Model**: `deepseek-v4-flash-vision-exp`
-- **Supported image formats**: JPEG, PNG, GIF, WebP
+- **Model**: `deepseek-flash` (legacy name `deepseek-v4-flash-vision-exp` routes to `deepseek-flash` for backward compatibility)
+- **Supported image formats**: JPEG, PNG, GIF, WebP (format is detected directly from file binary contents, not the declared MIME type or file extension)
 - **Maximum images per request**: 600 images
 - **Maximum request body size**: 48 MiB
-- **Token calculation**: Images are dynamically encoded into input tokens capped at **384 tokens per image**
-- **Pricing**: Billed as standard input tokens at `deepseek-v4-flash` rates ($0.07/$0.14 per 1M tokens off-peak/peak); zero image surcharge
-- **Supported message roles**: `user`, `developer`, `function_call_output`, `custom_tool_call_output` (images in `system` or `assistant` roles return `400 Bad Request`)
+- **Token calculation & dynamic scaling**: Before inference, each image is automatically resized:
+  - Images with total pixel count below roughly 544×544 are scaled up while preserving aspect ratio.
+  - Larger images are scaled down while preserving aspect ratio so that total pixel count is roughly that of a 1300×1300 image.
+  - As a result, there is an upper bound of **1,024 tokens per image** (a 2000×2000 image and a 5000×5000 image consume the same number of tokens after resizing).
+- **Pricing**: Billed as standard input tokens at `deepseek-flash` rates ($0.15/$0.30 per 1M tokens off-peak/peak); zero additional image surcharge
+- **Supported message roles**: `user` messages in Chat Completions (`400 Bad Request` if placed in `system` or `assistant`). In Responses API, allowed in `user` and `developer` message items, and inside tool call outputs.
+
+#### Detail Level
+
+For `image_url` inputs, you can optionally set a `detail` parameter to control image processing:
+- `"low"`: Downscales the image to 512×512 before inference (faster and cheaper when fine visual detail is not required)
+- `"high"`: Keeps the original image resolution
+- `"original"`: Keeps the original image resolution
+- `"auto"`: Automatic selection (currently equivalent to `"original"`)
 
 #### Input Formats
 
@@ -1518,7 +1676,8 @@ response = client.completions.create(
 {
   "type": "image_url",
   "image_url": {
-    "url": "https://example.com/architecture-diagram.png"
+    "url": "https://example.com/architecture-diagram.png",
+    "detail": "low"
   }
 }
 ```
@@ -1536,12 +1695,12 @@ response = client.completions.create(
 3. **Files API Reference (`file_id`)**:
 ```json
 {
-  "type": "image_url",
-  "image_url": {
-    "url": "file_id:file-api-abcdef1234567890"
-  }
+  "type": "file",
+  "file_id": "file-api-abcdef1234567890"
 }
 ```
+
+*(Alternatively, an inline file block: `{"type": "file", "file_data": "data:image/jpeg;base64,...", "filename": "diagram.jpg"}`).*
 
 #### Python Example (Vision Analysis)
 
@@ -1560,7 +1719,7 @@ with open("system_design.png", "rb") as f:
     encoded_image = base64.b64encode(f.read()).decode("utf-8")
 
 response = client.chat.completions.create(
-    model="deepseek-v4-flash-vision-exp",
+    model="deepseek-flash",
     messages=[
         {
             "role": "user",
@@ -1569,7 +1728,8 @@ response = client.chat.completions.create(
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{encoded_image}"
+                        "url": f"data:image/png;base64,{encoded_image}",
+                        "detail": "high"
                     }
                 }
             ]
@@ -1585,7 +1745,7 @@ print(response.choices[0].message.content)
 
 ## 7. OpenAI Compatibility
 
-The DeepSeek API is fully compatible with the **OpenAI Chat Completions API format** and supports the OpenAI SDKs across Python, TypeScript, and Node.js.
+The DeepSeek API is fully compatible with the **OpenAI Chat Completions API format** and **Responses API**, and supports the OpenAI SDKs across Python, TypeScript, and Node.js.
 
 ### Configuration Differences
 
@@ -1593,16 +1753,16 @@ The DeepSeek API is fully compatible with the **OpenAI Chat Completions API form
 |---|---|---|
 | `base_url` | `https://api.openai.com/v1` | `https://api.deepseek.com` |
 | `api_key` | OpenAI API key | DeepSeek API key |
-| `model` | `gpt-4o`, `o1`, etc. | `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp` |
-| Thinking mode | Not natively supported | Via `extra_body: {"thinking": {...}}` |
+| `model` | `gpt-4o`, `o1`, etc. | `deepseek-flash`, `deepseek-v4-pro` |
+| Thinking mode | Not natively supported | Via `extra_body: {"thinking": {...}}` or `reasoning.effort` |
 | `reasoning_effort` | Supported on reasoning models | Supported (`"low"`, `"high"`, `"max"`) |
-| Responses API | Supported | Supported natively |
+| Responses API | Supported (`/v1/responses`) | Supported natively (`/responses`) |
 
 ### Migration Steps
 
 1. Change `base_url` to `https://api.deepseek.com`
 2. Replace API key with a DeepSeek API key (`sk-...`)
-3. Change model to `deepseek-v4-pro`, `deepseek-v4-flash`, or `deepseek-v4-flash-vision-exp`
+3. Change model to `deepseek-flash` or `deepseek-v4-pro`
 4. (Optional) Add `extra_body: {"thinking": {"type": "enabled"}}` for thinking mode
 5. (Optional) Add `reasoning_effort` parameter (`"low"`, `"high"`, or `"max"`)
 
@@ -1615,7 +1775,7 @@ DeepSeek supports standard OpenAI request parameters. Unsupported or deprecated 
 | Feature | OpenAI | DeepSeek | Notes |
 |---|---|---|---|
 | Chat Completions | Yes | Yes | Full parity |
-| Vision / Images | Yes | Yes | Supported via `deepseek-v4-flash-vision-exp` and Files API |
+| Vision / Images | Yes | Yes | Supported natively on `deepseek-flash` and via Files API |
 | Files API | Yes | Yes | Supported via `/files` endpoint (free storage) |
 | Responses API | Yes | Yes | Native compatibility |
 | Thinking Mode | Yes (`o1`, `o3`) | Yes | Native thinking toggle + `reasoning_content` delta streaming |
@@ -1641,12 +1801,12 @@ api_key:  <DeepSeek API key (starts with sk-)>
 
 When using the Anthropic API, Claude model names are automatically mapped:
 
-| Claude Model Pattern | Mapped To |
-|---|---|
-| `claude-opus*` | `deepseek-v4-pro` |
-| `claude-haiku*` | `deepseek-v4-flash` |
-| `claude-sonnet*` | `deepseek-v4-flash` |
-| Any unsupported name | `deepseek-v4-flash` |
+| Claude Model Pattern | Mapped To | Pricing |
+|---|---|---|
+| `claude-opus*` | `deepseek-v4-pro` | Billed at V4 Pro rates |
+| `claude-haiku*` | `deepseek-flash` | Billed at Flash rates |
+| `claude-sonnet*` | `deepseek-flash` | Billed at Flash rates |
+| Any unsupported name | `deepseek-flash` | Billed at Flash rates |
 
 This mapping is useful for tools like Claude Desktop APP developer mode — just change the `base_url` and `api_key`.
 
@@ -1655,12 +1815,23 @@ This mapping is useful for tools like Claude Desktop APP developer mode — just
 **HTTP Headers:**
 | Field | Support Status |
 |---|---|
-| `anthropic-beta` | Ignored |
+| `anthropic-beta` | Ignored for `/messages`; required (`files-api-2025-04-14`) for Files API endpoints |
 | `anthropic-version` | Ignored |
 | `x-api-key` | Fully Supported |
 
-**Message Fields:**
-Most Anthropic message fields are supported with equivalent DeepSeek functionality.
+**Message Fields & Multimodal Images:**
+Anthropic message formats support text and native image blocks (`deepseek-flash`):
+```json
+{
+  "type": "image",
+  "source": {
+    "type": "base64",
+    "media_type": "image/jpeg",
+    "data": "<BASE64_DATA>"
+  }
+}
+```
+*(Alternatively, `source.type: "url"` with `url: "https://..."` or `source.type: "file"` with `file_id: "file-api-..."`).*
 
 **Thinking Mode via Anthropic Format:**
 ```json
@@ -1670,6 +1841,7 @@ Most Anthropic message fields are supported with equivalent DeepSeek functionali
   }
 }
 ```
+*(Or `{"reasoning": {"effort": "none/low/high/max"}}` where `"none"` disables thinking mode).*
 
 ### Using the Anthropic SDK
 
@@ -1683,8 +1855,9 @@ client = Anthropic(
 )
 
 message = client.messages.create(
-    model="claude-opus-4-20250514",  # mapped to deepseek-v4-pro
+    model="deepseek-flash",  # or claude-opus-4-20250514 to map to deepseek-v4-pro
     max_tokens=1024,
+    system="You are a helpful assistant.",
     messages=[
         {"role": "user", "content": "Hello, world"}
     ]
@@ -1698,28 +1871,28 @@ export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=<deepseek-api-key>
 ```
 
-> **Note**: When you pass an unsupported model name to the DeepSeek Anthropic API, it will automatically map to `deepseek-v4-flash`.
+> **Note**: When you pass an unsupported model name to the DeepSeek Anthropic API, it will automatically map to `deepseek-flash`.
 
 ---
 
 ## 9. Agent Integrations
 
-DeepSeek integrates with popular AI agent and coding assistant tools. These are third-party integrations listed for developer reference. DeepSeek does not guarantee effectiveness or security.
+DeepSeek integrates with popular AI agent and coding assistant tools. These are third-party integrations listed for developer reference.
 
 ### Claude Code
 
 [Claude Code](https://github.com/anthropics/claude-code) is an AI coding assistant that runs in the terminal.
 
-**Environment variables for Claude Code:**
+**Environment variables for Claude Code (recommended configuration):**
 ```bash
 export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=<deepseek-api-key>
-export ANTHROPIC_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
-export CLAUDE_CODE_EFFORT_LEVEL=max
+export ANTHROPIC_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-flash"
+export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-flash"
+export CLAUDE_CODE_EFFORT_LEVEL="max"
 ```
 
 **Installation from scratch:**
@@ -1733,20 +1906,13 @@ claude
 
 ### GitHub Copilot
 
-A VS Code extension that adds DeepSeek V4 Pro & Flash into the Copilot Chat model picker.
-
-**Requirements:**
-- VS Code 1.116 or later
-- GitHub Copilot subscription (free tier works)
-- DeepSeek V4 for Copilot Chat extension (from GitHub)
+A VS Code extension that adds DeepSeek models into the Copilot Chat model picker.
 
 **Configuration:**
 1. Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
 2. Run **DeepSeek: Set API Key** and paste your key
 3. Open Copilot Chat (`Cmd+Shift+I` / `Ctrl+Shift+I`)
-4. Click the model picker and choose **DeepSeek V4 Pro** or **DeepSeek V4 Flash**
-
-**Vision support**: DeepSeek V4 is text-only, but the extension proxies images through another Copilot model (Claude, GPT-4o) before sending to DeepSeek.
+4. Click the model picker and choose **DeepSeek Flash** or **DeepSeek V4 Pro**
 
 ### OpenCode
 
@@ -1756,7 +1922,31 @@ A VS Code extension that adds DeepSeek V4 Pro & Flash into the Copilot Chat mode
 1. Run `opencode`
 2. Type `/connect`, enter `deepseek`, select the provider
 3. Enter your DeepSeek API key
-4. Select the DeepSeek-V4-Pro model
+4. Select the **DeepSeek-V4.1-Flash** model (`deepseek-flash`)
+
+### OpenClaw
+
+[OpenClaw](https://openclaw.ai) is an open-source personal AI assistant extensible via Skills.
+
+**Installation & Configuration:**
+```bash
+# Linux / macOS
+curl -fsSL https://openclaw.ai/install.sh | bash
+
+# Windows PowerShell
+iwr -useb https://openclaw.ai/install.ps1 | iex
+```
+During initial setup, select DeepSeek as the provider, enter your API key, and set `deepseek-flash` as the default model.
+
+### OpenAI Codex & Responses API Agents
+
+Agents compatible with the OpenAI Responses API format connect directly to `https://api.deepseek.com/responses`. DeepSeek provides first-class support for the `apply_patch` custom tool:
+```json
+{
+  "type": "custom",
+  "name": "apply_patch"
+}
+```
 
 ---
 
@@ -1766,8 +1956,8 @@ A VS Code extension that adds DeepSeek V4 Pro & Flash into the Copilot Chat mode
 
 | Model | Concurrency Limit |
 |---|---|
+| `deepseek-flash` | 2500 |
 | `deepseek-v4-pro` | 500 |
-| `deepseek-v4-flash` | 2500 |
 
 - A request counts as one concurrent connection from the time it is sent until the model response is complete
 - Concurrency limits are calculated at the **account level**, regardless of which API Key is used
@@ -1776,30 +1966,47 @@ A VS Code extension that adds DeepSeek V4 Pro & Flash into the Copilot Chat mode
 
 ### user_id Isolation
 
-The `user` parameter (`user_id`) enables fine-grained management of different end-users under the same account.
+The `user_id` parameter enables fine-grained management of different end-users under the same account.
+
+**Validation Rules:**
+- Must match the regex `[a-zA-Z0-9\-_]+`
+- Maximum length of 512 characters
+- Must not contain private or sensitive personal user data
 
 **Functions of user_id:**
 - **Content Safety Isolation**: Distinguishes user identities for content safety handling
 - **KVCache Isolation**: Isolates KVCache for privacy management
 - **Scheduling Isolation**: Schedules users separately
-
-**Concurrency behavior with user_id:**
-- For regular API users: all user_id values are combined for concurrency limit calculation
-- For users with increased quotas: total concurrency is limited per account AND per user_id
-- Per-user_id limits: deepseek-v4-pro = 500, deepseek-v4-flash = 2500
-- An empty id is treated as a special user_id
-- Exceeding the per-user_id limit returns HTTP 429
+- **Per-user concurrency limits**: For accounts with expanded quotas, each `user_id` has its own concurrency limit (2500 for `deepseek-flash`, 500 for `deepseek-v4-pro`). Exceeding the limit returns HTTP 429.
 
 **Setting user_id:**
-```python
-response = client.chat.completions.create(
-    model="deepseek-v4-pro",
-    messages=[...],
-    user="user_abc_123"  # Must be a string
-)
-```
+- In OpenAI SDK:
+  ```python
+  response = client.chat.completions.create(
+      model="deepseek-flash",
+      messages=[{"role": "user", "content": "Hello!"}],
+      extra_body={"user_id": "end_user_12345"}
+  )
+  ```
+- In Anthropic SDK:
+  ```python
+  message = client.messages.create(
+      model="deepseek-flash",
+      messages=[{"role": "user", "content": "Hello!"}],
+      metadata={"user_id": "end_user_12345"},
+      max_tokens=1024
+  )
+  ```
+- In Responses API:
+  ```json
+  {"model": "deepseek-flash", "input": "Hello!", "user": "end_user_12345"}
+  ```
 
----
+### Request Keep-Alive Mechanism
+
+During long generations or queuing, DeepSeek maintains persistent HTTP connections:
+- **Non-streaming requests**: Continuously emits empty lines (`\n`) to prevent socket timeouts
+- **Streaming requests**: Continuously returns SSE keep-alive comments (`: keep-alive\n\n`)
 
 ## 11. Error Codes & Handling
 
@@ -2160,7 +2367,7 @@ const client = new OpenAI({
 
 async function streamResponse(prompt: string): Promise<string> {
     const stream = await client.chat.completions.create({
-        model: "deepseek-v4-flash",
+        model: "deepseek-flash",
         messages: [{ role: "user", content: prompt }],
         stream: true,
     });
@@ -2191,7 +2398,7 @@ def chat(user_input: str) -> str:
     messages.append({"role": "user", "content": user_input})
 
     response = client.chat.completions.create(
-        model="deepseek-v4-flash",
+        model="deepseek-flash",
         messages=messages
     )
 
@@ -2225,7 +2432,7 @@ def analyze_image(image_path: str, prompt: str) -> str:
         base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
     response = client.chat.completions.create(
-        model="deepseek-v4-flash-vision-exp",
+        model="deepseek-flash",
         messages=[
             {
                 "role": "user",
@@ -2234,7 +2441,8 @@ def analyze_image(image_path: str, prompt: str) -> str:
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
+                            "url": f"data:image/jpeg;base64,{base64_image}",
+                            "detail": "high"
                         }
                     }
                 ]
@@ -2256,7 +2464,8 @@ UPLOAD_RESP=$(curl -s https://api.deepseek.com/files \
   -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
   -F "file=@diagram.png" \
   -F "purpose=user_data" \
-  -F "expires_in=604800")
+  -F "expires_after[anchor]=created_at" \
+  -F "expires_after[seconds]=604800")
 
 FILE_ID=$(echo $UPLOAD_RESP | jq -r '.id')
 echo "Uploaded File ID: $FILE_ID"
@@ -2266,17 +2475,55 @@ curl https://api.deepseek.com/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
   -d "{
-    \"model\": \"deepseek-v4-flash-vision-exp\",
+    \"model\": \"deepseek-flash\",
     \"messages\": [
       {
         \"role\": \"user\",
         \"content\": [
           {\"type\": \"text\", \"text\": \"Explain the database relationships in this schema.\"},
-          {\"type\": \"image_url\", \"image_url\": {\"url\": \"file_id:${FILE_ID}\"}}
+          {\"type\": \"file\", \"file_id\": \"${FILE_ID}\"}
         ]
       }
     ]
   }"
+```
+
+### 13.11 Responses API Multi-turn Agent (Python)
+
+```python
+import os
+import requests
+
+api_key = os.environ["DEEPSEEK_API_KEY"]
+url = "https://api.deepseek.com/responses"
+
+payload = {
+    "model": "deepseek-flash",
+    "instructions": "You are an autonomous coding assistant.",
+    "input": [
+        {
+            "role": "user",
+            "content": [
+                {"type": "input_text", "text": "Inspect the repository and summarize proposed architecture fixes."}
+            ]
+        }
+    ],
+    "reasoning": {"effort": "high"}
+}
+
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json"
+}
+
+resp = requests.post(url, json=payload, headers=headers)
+data = resp.json()
+
+for item in data.get("output", []):
+    if item.get("type") == "message":
+        for part in item.get("content", []):
+            if part.get("type") == "output_text":
+                print(part.get("text"))
 ```
 
 ---
@@ -2312,7 +2559,7 @@ curl https://api.deepseek.com/chat/completions \
 
 | Technique | Model | Expected Improvement |
 |---|---|---|
-| Use `deepseek-v4-flash` | Flash | 3-5x faster than Pro |
+| Use `deepseek-flash` | Flash | 3-5x faster than Pro |
 | Disable thinking mode | Both | 2-4x lower TTFT |
 | Lower `max_tokens` | Both | Directly proportional |
 | Use streaming | Both | Lower perceived latency |
@@ -2356,7 +2603,7 @@ from openai import OpenAI
 from typing import List, Dict
 
 class DeepSeekChatbot:
-    def __init__(self, model: str = "deepseek-v4-flash"):
+    def __init__(self, model: str = "deepseek-flash"):
         self.client = OpenAI(
             api_key=os.environ["DEEPSEEK_API_KEY"],
             base_url="https://api.deepseek.com"
@@ -2386,7 +2633,7 @@ class DeepSeekChatbot:
                 yield chunk.choices[0].delta.content
 
 # Usage
-bot = DeepSeekChatbot(model="deepseek-v4-flash")
+bot = DeepSeekChatbot(model="deepseek-flash")
 for token in bot.chat(
     [{"role": "user", "content": "Tell me a joke about programming"}],
     stream=True
@@ -2420,7 +2667,7 @@ def review_code(code: str, language: str = "python"):
 
 def generate_code(description: str, language: str = "python"):
     response = client.chat.completions.create(
-        model="deepseek-v4-flash",
+        model="deepseek-flash",
         messages=[
             {"role": "system", "content": f"You are an expert {language} developer. Write clean, well-documented code."},
             {"role": "user", "content": description}
@@ -2588,7 +2835,7 @@ client = OpenAI(
 async def chat(prompt: str):
     async def generate():
         stream = client.chat.completions.create(
-            model="deepseek-v4-flash",
+            model="deepseek-flash",
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
@@ -2614,7 +2861,7 @@ client = OpenAI(
 
 def extract_entities(text: str) -> dict:
     response = client.chat.completions.create(
-        model="deepseek-v4-flash",
+        model="deepseek-flash",
         messages=[
             {"role": "system", "content": "Extract entities from text as JSON."},
             {"role": "user", "content": f"Extract: persons (name, role), organizations, dates, and locations from:\n\n{text}\n\nReturn valid JSON."}
@@ -2638,6 +2885,16 @@ for text in texts:
 ---
 
 ## 16. Changelog
+
+### 2026-09-10 — DeepSeek-V4.1-Flash Release, Lower Pricing & Responses API
+
+- **DeepSeek-V4.1-Flash Released**: Launched DeepSeek-V4.1-Flash as the primary high-speed model (`deepseek-flash`). Built on a 552B parameter MoE architecture with an asymmetric Causal Encoder-Decoder (8B active input parameters, 16B active output parameters).
+- **Native Multimodal Vision**: Native visual understanding (JPEG, PNG, GIF, WebP) directly incorporated into `deepseek-flash` with dynamic resolution scaling and a 1,024 token/image ceiling.
+- **Dramatically Compressed KV Cache**: Requires only 1/4 the HBM and 1/8 the SSD storage of prior generations, drastically reducing agentic cache-hit costs.
+- **Model Retirement & Migration Routing**: `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` retired; legacy requests automatically route to `deepseek-flash` at V4.1-Flash pricing.
+- **V4-Pro Service Continuation**: Due to popular demand, `deepseek-v4-pro` continues API services past September 14, 2026 with unchanged billing.
+- **Substantial Price Reductions**: Input cache hit reduced to $0.003 (off-peak) / $0.006 (peak); input cache miss reduced to $0.15 / $0.30; output reduced to $0.60 / $1.20 per 1M tokens.
+- **Responses API GA**: Full production support for OpenAI Responses API format (`POST /responses`), including the `apply_patch` custom tool for coding agents.
 
 ### 2026-08-21 — DeepSeek-V4-Flash-Vision-Exp & Files API
 
@@ -2727,12 +2984,14 @@ for text in texts:
 
 | Item | Deprecation / Retirement Date | Status |
 |---|---|---|
+| `deepseek-v4-flash` model name | 2026-09-10 04:00 UTC | **Retired** (routes to `deepseek-flash`) |
+| `deepseek-v4-flash-vision-exp` model name | 2026-09-10 04:00 UTC | **Retired** (routes to `deepseek-flash`) |
 | `deepseek-chat` model name | 2026-07-24 15:59 UTC | **Retired** |
 | `deepseek-reasoner` model name | 2026-07-24 15:59 UTC | **Retired** |
 | V3.2-Speciale endpoint | 2025-12-15 15:59 UTC | **Expired** |
 | V3.1-Terminus comparison endpoint | 2025-10-15 15:59 UTC | **Expired** |
 
-**Migration path**: Replace `deepseek-chat` with `deepseek-v4-flash` (for non-thinking mode) and `deepseek-reasoner` with `deepseek-v4-flash` or `deepseek-v4-pro` with thinking enabled.
+**Migration path**: Replace legacy model names (`deepseek-chat`, `deepseek-reasoner`, `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`) with `deepseek-flash` (or `deepseek-v4-pro` for deep reasoning).
 
 ---
 
@@ -2742,14 +3001,14 @@ for text in texts:
 
 1. **Empty JSON responses**: When using JSON Output, the API may occasionally return empty content. DeepSeek is actively optimizing this. Workaround: modify the prompt to be more specific.
 
-2. **Silent parameter ignoring**: Parameters like `temperature`, `top_p`, `presence_penalty`, and `frequency_penalty` have no effect in thinking mode but do not trigger errors. This is by design for compatibility.
+2. **Silent parameter ignoring**: Parameters like `temperature`, `presence_penalty`, and `frequency_penalty` have no effect in thinking mode but do not trigger errors. This is by design for compatibility.
 
 3. **reasoning_content behavior**:
-   - When the model did NOT perform a tool call between two user messages, `reasoning_content` from the intermediate assistant can be dropped
+   - When the model did NOT perform a tool call between two user messages, `reasoning_content` from the intermediate assistant does not need to be sent back (if sent, it is ignored)
    - When the model DID perform a tool call, `reasoning_content` MUST be included in subsequent turns
    - If sent in a context where it's not needed, the API silently ignores it
 
-4. **Anthropic model fallback**: Any model name that doesn't match the known Claude patterns maps to `deepseek-v4-flash`, not the Pro model.
+4. **Anthropic model fallback**: Any model name that doesn't match the known Claude patterns maps to `deepseek-flash`, not the Pro model.
 
 5. **Beta features require base_url change**: Chat Prefix Completion, FIM Completion, and strict mode all require `base_url="https://api.deepseek.com/beta"`.
 
@@ -2759,15 +3018,15 @@ for text in texts:
 
 7. **Anthropic `x-api-key`**: The Anthropic SDK uses `x-api-key` header for auth. DeepSeek fully supports this.
 
-8. **Anthropic `anthropic-version` and `anthropic-beta` headers**: These are ignored by DeepSeek. Set them if your SDK requires them, but they have no effect.
+8. **Anthropic `anthropic-version` and `anthropic-beta` headers**: `anthropic-version` is ignored. `anthropic-beta` is ignored for `/messages` but required (`files-api-2025-04-14`) for Files API endpoints on the Anthropic base URL.
 
-9. **Model name unsupported in Anthropic format**: Unsupported Anthropic model names are silently mapped to flash, not rejected. This means typos won't fail but may silently underperform.
+9. **Model name unsupported in Anthropic format**: Unsupported Anthropic model names are silently mapped to `deepseek-flash`, not rejected. This means typos won't fail but will route to Flash.
 
 ### Edge Cases
 
 10. **Empty user_id**: An empty string `user_id` is treated as a special, separate user_id for isolation purposes.
 
-11. **Concurrent requests from same user_id**: For accounts with expanded quotas, each `user_id` has its own concurrency limit (500 for pro, 2500 for flash).
+11. **Concurrent requests from same user_id**: For accounts with expanded quotas, each `user_id` has its own concurrency limit (500 for `deepseek-v4-pro`, 2500 for `deepseek-flash`).
 
 12. **Cache miss vs cache hit**: Cache hits require an EXACT match of an entire cache prefix unit. Partial overlaps do NOT trigger cache hits.
 
@@ -2777,15 +3036,21 @@ for text in texts:
 
 15. **The `stop` parameter exclusion**: The returned text will NOT contain the stop sequence, but token counts may still include it depending on implementation. Always verify.
 
-16. **Vision message role constraints**: In `deepseek-v4-flash-vision-exp`, images are only supported in `user`, `developer`, `function_call_output`, and `custom_tool_call_output` messages. Sending an image in `system` or `assistant` roles returns a `400 Bad Request` error.
+16. **Vision message role constraints**: In `deepseek-flash`, images are supported in `user` messages in Chat Completions. In Responses API, supported in `user`, `developer`, `function_call_output`, and `custom_tool_call_output` items. Sending an image in `system` or `assistant` roles returns a `400 Bad Request` error.
 
-17. **Image URL vs File ID exclusivity**: Each image content part must provide either an external URL/data URI or a `file_id:...` reference. You cannot supply both in the same content item.
+17. **Image URL vs File ID exclusivity**: Each image content part must provide either an external URL/data URI or a `file_id:...` reference. Passing both or neither returns a `400 Bad Request` error.
 
 18. **Files API purpose restriction**: Files uploaded via `POST /files` must have `purpose="user_data"`. Other purpose values are currently rejected.
 
-19. **Request body size limits**: Chat completion requests have a maximum body limit of 48 MiB. For large batches of high-resolution images, upload images through the Files API (which supports up to 64 MiB per file) and pass `file_id:...` references.
+19. **Request body size limits**: Chat completion requests have a maximum body limit of 48 MiB. For large batches of high-resolution images, upload images through the Files API (which supports up to 64 MiB per file) and pass `file_id:...` references (up to 200 MiB total images per request).
 
-20. **Image token calculation**: Images are dynamically converted into tokens based on dimensions and capped at **384 tokens per image**. Regardless of resolution, an image will not consume more than 384 input tokens.
+20. **Image token calculation**: Images are dynamically converted into tokens based on dimensions and capped at **1,024 tokens per image** after automatic resizing.
+
+21. **Mid-conversation tool insertion**: Only supported in Anthropic API and Responses API; Chat Completions returns 400 if artificial tool messages are inserted mid-history.
+
+22. **Top_p clamping behavior**: In thinking mode, `top_p` has a lower bound of `0.95`. Any value passed below 0.95 is automatically raised to 0.95. In non-thinking mode, `top_p` is fixed at 1.0.
+
+23. **V4.1-Flash KV Cache optimization**: The asymmetric Causal Encoder-Decoder architecture cuts KV cache requirements to 1/4 HBM and 1/8 SSD storage, yielding massive performance and cost savings during multi-turn agent execution.
 
 ---
 
