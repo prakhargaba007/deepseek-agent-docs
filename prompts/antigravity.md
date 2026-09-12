@@ -46,12 +46,12 @@ repository root. It is the authoritative reference. Do not use training data
 or web searches for DeepSeek API model names, parameters, or behavior.
 
 Key facts:
-- Models: deepseek-v4-pro (complex tasks), deepseek-v4-flash (fast/cheap)
-- Base URL: https://api.deepseek.com
+- Models: deepseek-flash (primary, fast/cheap, vision GA), deepseek-v4-pro (complex tasks, deep reasoning)
+- Base URL: https://api.deepseek.com (supports Chat Completions and Responses API POST /responses)
 - Beta features: https://api.deepseek.com/beta
 - Anthropic format: https://api.deepseek.com/anthropic
 - Thinking mode: pass via extra_body={"thinking": {"type": "enabled"}} (OpenAI SDK)
-- Never use: deepseek-chat or deepseek-reasoner (deprecated 2026-07-24)
+- Never use retired models: deepseek-v4-flash, deepseek-v4-flash-vision-exp, deepseek-chat, deepseek-reasoner
 - Edge cases: see Section 17 of deepseek.md
 ```
 

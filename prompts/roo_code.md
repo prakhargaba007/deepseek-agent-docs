@@ -19,9 +19,9 @@ When you encounter or are asked to write code that calls the DeepSeek API:
    outdated DeepSeek API information.
 
 2. **Model names** (always verify against deepseek.md):
-   - `deepseek-v4-pro` — complex tasks, reasoning, production agent workflows
-   - `deepseek-v4-flash` — fast, cost-effective tasks
-   - ❌ Do NOT use: `deepseek-chat`, `deepseek-reasoner` (deprecated)
+   - `deepseek-flash` — fast, cost-effective tasks, vision support, 2500 concurrency limit
+   - `deepseek-v4-pro` — complex tasks, deep reasoning, STEM/code proofs, 500 concurrency limit
+   - ❌ Do NOT use retired models: `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`, `deepseek-chat`, `deepseek-reasoner`
 
 3. **OpenAI SDK thinking mode**: The `thinking` parameter is NOT a standard
    OpenAI parameter. Always pass it via `extra_body`:

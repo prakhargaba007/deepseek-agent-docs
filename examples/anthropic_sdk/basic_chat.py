@@ -6,8 +6,8 @@ The DeepSeek API supports the Anthropic message format at:
 
 Claude model names are automatically mapped:
   claude-opus*   → deepseek-v4-pro
-  claude-haiku*  → deepseek-v4-flash
-  claude-sonnet* → deepseek-v4-flash
+  claude-haiku*  → deepseek-flash
+  claude-sonnet* → deepseek-flash
 
 Usage:
     export DEEPSEEK_API_KEY="sk-your-key"

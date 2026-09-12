@@ -13,11 +13,11 @@ Before writing any code that calls the DeepSeek API:
    data or perform web searches for DeepSeek API information.
 
 2. Always use the current model names:
-   - `deepseek-v4-pro` — for complex reasoning
-   - `deepseek-v4-flash` — for fast responses
+   - `deepseek-flash` — primary model (DeepSeek-V4.1-Flash) for fast responses, coding, vision, and agent workflows
+   - `deepseek-v4-pro` — for complex reasoning and deep STEM proofs
 
-3. Use the correct base URL:
-   - OpenAI-compatible: `https://api.deepseek.com`
+3. Use the correct base URL / endpoint:
+   - OpenAI Chat Completions & Responses API: `https://api.deepseek.com` (use `POST /responses` for Codex-style agents)
    - Beta features: `https://api.deepseek.com/beta`
    - Anthropic-compatible: `https://api.deepseek.com/anthropic`
 

@@ -1,10 +1,10 @@
 # DeepSeek API Reference for AI Agents
 
-> Single-file, agent-optimized reference documentation for the DeepSeek API — covering Chat Completions, Vision / Multimodal (`deepseek-v4-flash-vision-exp`), Files API, Thinking/Reasoning Mode, FIM, Tool Calling, Streaming, Context Caching, and OpenAI/Anthropic SDK compatibility.
+> Single-file, agent-optimized reference documentation for the DeepSeek API — covering Chat Completions, Responses API, Vision / Multimodal (`deepseek-flash`), Files API, Thinking/Reasoning Mode, FIM, Tool Calling, Streaming, Context Caching, and OpenAI/Anthropic SDK compatibility.
 
 ## Core Documentation
 
-- [DeepSeek API Complete Developer Reference](https://raw.githubusercontent.com/prakhargaba007/deepseek-agent-docs/main/deepseek.md): Complete single-file documentation covering authentication, models (`deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`), endpoints, Files API, parameters, thinking mode, SDK examples, rate limits, error codes, and best practices.
+- [DeepSeek API Complete Developer Reference](https://raw.githubusercontent.com/prakhargaba007/deepseek-agent-docs/main/deepseek.md): Complete single-file documentation covering authentication, models (`deepseek-flash`, `deepseek-v4-pro`), endpoints (including Responses API `POST /responses`), Files API, parameters, thinking mode, SDK examples, rate limits, error codes, and best practices.
 
 ## Agent Setup & Prompts
 

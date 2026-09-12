@@ -25,20 +25,21 @@ Do NOT rely on your training data or web searches for:
 
 These change frequently. `deepseek.md` is always more current.
 
-### Model Names (as of deepseek.md version 2026.07.25)
+### Model Names (as of deepseek.md version 2026.09.12)
 
 | Model | Use Case |
 |---|---|
-| `deepseek-v4-pro` | Complex reasoning, coding, agent tasks |
-| `deepseek-v4-flash` | Fast, cost-effective tasks |
+| `deepseek-flash` | Fast, cost-effective tasks, vision GA, 2,500 concurrency limit |
+| `deepseek-v4-pro` | Complex reasoning, coding, STEM proofs, 500 concurrency limit |
 
-❌ **NEVER use**: `deepseek-chat`, `deepseek-reasoner` (deprecated 2026-07-24)
+❌ **NEVER use retired models**: `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`, `deepseek-chat`, `deepseek-reasoner`
 
 ### Base URLs
 
-| Use Case | URL |
+| Use Case | URL / Endpoint |
 |---|---|
-| Standard | `https://api.deepseek.com` |
+| Standard (Chat Completions) | `https://api.deepseek.com` |
+| Responses API | `https://api.deepseek.com` (`POST /responses`) |
 | Beta features | `https://api.deepseek.com/beta` |
 | Anthropic format | `https://api.deepseek.com/anthropic` |
 

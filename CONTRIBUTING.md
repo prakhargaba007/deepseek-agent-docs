@@ -83,7 +83,7 @@ python scripts/check_formatting.py
 - All code examples must be **runnable** (or clearly marked as pseudo-code).
 - Use `os.environ.get("DEEPSEEK_API_KEY")` for API keys — never hardcode them.
 - Add comments for non-obvious lines.
-- Use the current model names: `deepseek-v4-pro` or `deepseek-v4-flash`.
+- Use the current model names: `deepseek-flash` or `deepseek-v4-pro`.
 - Include `import` statements and all necessary setup code.
 
 ---

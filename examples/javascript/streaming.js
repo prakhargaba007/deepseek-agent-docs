@@ -14,7 +14,7 @@ const client = new OpenAI({
 
 async function main() {
   const stream = await client.chat.completions.create({
-    model: "deepseek-v4-flash",
+    model: "deepseek-flash",
     messages: [
       { role: "user", content: "Explain the event loop in JavaScript." },
     ],

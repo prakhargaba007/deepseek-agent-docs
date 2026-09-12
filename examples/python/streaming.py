@@ -17,7 +17,7 @@ def main():
     )
 
     stream = client.chat.completions.create(
-        model="deepseek-v4-flash",
+        model="deepseek-flash",
         messages=[
             {"role": "user", "content": "Explain how HTTPS works in simple terms."},
         ],

@@ -24,8 +24,8 @@ When you write, review, or debug DeepSeek API code, you MUST:
    web search results for DeepSeek API details.
 
 2. Use only these model names:
+   - `deepseek-flash` — 1M context, thinking enabled, fast tasks, vision support
    - `deepseek-v4-pro` — 1M context, thinking enabled, complex tasks
-   - `deepseek-v4-flash` — 1M context, thinking enabled, fast tasks
 
 3. Use the correct endpoint:
    - OpenAI-compatible: `https://api.deepseek.com`
@@ -47,16 +47,16 @@ When you write, review, or debug DeepSeek API code, you MUST:
 {
   "models": [
     {
-      "title": "DeepSeek V4 Pro",
+      "title": "DeepSeek Flash",
       "provider": "openai",
-      "model": "deepseek-v4-pro",
+      "model": "deepseek-flash",
       "apiBase": "https://api.deepseek.com",
       "apiKey": "$DEEPSEEK_API_KEY"
     },
     {
-      "title": "DeepSeek V4 Flash",
+      "title": "DeepSeek V4 Pro",
       "provider": "openai",
-      "model": "deepseek-v4-flash",
+      "model": "deepseek-v4-pro",
       "apiBase": "https://api.deepseek.com",
       "apiKey": "$DEEPSEEK_API_KEY"
     }

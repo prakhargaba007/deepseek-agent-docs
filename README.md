@@ -39,7 +39,7 @@ This repository gives you [`deepseek.md`](deepseek.md) — a single, 75 KB Markd
 
 | Without this | With this |
 |---|---|
-| Uses deprecated `deepseek-chat` / `deepseek-reasoner` | ✅ Correct `deepseek-v4-pro` / `deepseek-v4-flash` |
+| Uses deprecated `deepseek-chat` / `deepseek-reasoner` | ✅ Correct `deepseek-flash` / `deepseek-v4-pro` |
 | Guesses at `reasoning_effort` behavior | ✅ Exact parameter docs with defaults |
 | Missing `extra_body` for thinking mode | ✅ Full OpenAI SDK workaround documented |
 | No knowledge of context caching | ✅ Cache hit/miss rules, ~50× cost savings |
@@ -71,7 +71,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="deepseek-v4-pro",
+    model="deepseek-flash",
     messages=[{"role": "user", "content": "Hello!"}],
     reasoning_effort="high",
     extra_body={"thinking": {"type": "enabled"}}  # Required for thinking mode via OpenAI SDK
@@ -86,11 +86,11 @@ print(response.choices[0].message.content)
 
 | Section | Coverage |
 |---|---|
-| Models & Pricing | `deepseek-v4-pro` (GA), `deepseek-v4-flash` (GA), `deepseek-v4-flash-vision-exp` (Exp), Peak/Off-Peak pricing |
-| All Endpoints | Chat Completions, Files API (`/files`), FIM (Beta), List Models, User Balance |
+| Models & Pricing | `deepseek-flash` (GA), `deepseek-v4-pro` (GA), Peak/Off-Peak pricing, legacy routing |
+| All Endpoints | Chat Completions, Responses API (`/responses`), Files API (`/files`), FIM (Beta), List Models, User Balance |
 | Parameters | Every parameter with type, default, and behavior notes |
 | Thinking Mode | Toggle, `reasoning_effort` (`low`/`high`/`max`), `reasoning_content` multi-turn rules |
-| Vision / Multimodal | Image formats (JPEG/PNG/GIF/WebP), URL / base64 / Files API inputs, token calculation (capped 384 tokens/img) |
+| Vision / Multimodal | Image formats (JPEG/PNG/GIF/WebP), URL / base64 / Files API inputs, token calculation (capped 1,024 tokens/img) |
 | Files API | Upload, list, retrieve, and delete images for multi-turn chat completions |
 | Streaming | SSE format, usage stats in final chunk |
 | Tool Calling | Standard + strict mode, full JSON Schema reference |
@@ -103,7 +103,7 @@ print(response.choices[0].message.content)
 | Rate Limits | Concurrency per model, `user_id` isolation |
 | Error Codes | All 7 codes with causes and solutions |
 | Best Practices | Production, prompt engineering, cost & latency optimization |
-| Hidden Edge Cases | 20 undocumented caveats and compatibility quirks |
+| Hidden Edge Cases | 23 undocumented caveats and compatibility quirks |
 
 ---
 
@@ -114,7 +114,7 @@ print(response.choices[0].message.content)
 Add to `.cursor/rules/deepseek.mdc`:
 ```
 Read deepseek.md before writing any DeepSeek API code.
-Use deepseek-v4-pro, deepseek-v4-flash, or deepseek-v4-flash-vision-exp. Never use deepseek-chat or deepseek-reasoner (retired).
+Use deepseek-flash or deepseek-v4-pro. Never use deepseek-chat or deepseek-reasoner (retired).
 Pass thinking via extra_body={"thinking": {"type": "enabled"}} when using the OpenAI SDK.
 ```
 
@@ -126,8 +126,8 @@ export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=$DEEPSEEK_API_KEY
 export ANTHROPIC_MODEL=deepseek-v4-pro
 export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-flash
+export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-flash
 export CLAUDE_CODE_EFFORT_LEVEL=max
 ```
 
@@ -148,13 +148,12 @@ Add to `CLAUDE.md`: `For DeepSeek API code, read deepseek.md first.`
 
 ## Supported Models
 
-| Model | Context | Max Output | Thinking | Vision | Pricing (Off-Peak / Peak per 1M) | Status |
-|---|---|---|---|---|---|---|
-| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ on by default | ❌ | $0.2175 / $0.435 (input miss) | **GA** |
-| `deepseek-v4-flash` | 1M tokens | 384K tokens | ✅ on by default | ❌ | $0.07 / $0.14 (input miss) | **GA** |
-| `deepseek-v4-flash-vision-exp` | 1M tokens | 384K tokens | ✅ on by default | ✅ JPEG, PNG, GIF, WebP | $0.07 / $0.14 (input miss) | **Experimental** |
+| Model | Context | Max Output | Thinking | Vision | Pricing (Off-Peak / Peak per 1M) | Concurrency | Status |
+|---|---|---|---|---|---|---|---|
+| `deepseek-flash` | 1M tokens | 384K tokens | ✅ on by default | ✅ JPEG, PNG, GIF, WebP | $0.15 / $0.30 (input miss)<br>$0.003 / $0.006 (cache hit)<br>$0.60 / $1.20 (output) | 2,500 | **GA** |
+| `deepseek-v4-pro` | 1M tokens | 384K tokens | ✅ on by default | ❌ | $0.66 / $1.32 (input miss)<br>$0.022 / $0.044 (cache hit)<br>$1.98 / $3.96 (output) | 500 | **GA** |
 
-> Cache hits are **~50× cheaper** ($0.007 / $0.0181 per 1M). See [Section 6.6](deepseek.md#66-context-caching) for caching rules.
+> Legacy aliases `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` automatically route to `deepseek-flash`. Cache hits are **~50× cheaper**. See [Section 6.6](deepseek.md#66-context-caching) for caching rules.
 
 ---
 
@@ -214,7 +213,7 @@ When DeepSeek releases new features:
 
 Uses **Calendar Versioning** (`YYYY.MM.DD`) — the version number tells you when the docs were last synced, which is exactly what matters for a documentation project.
 
-Current: `2026.09.02` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/prakhargaba007/deepseek-agent-docs/releases)
+Current: `2026.09.12` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/prakhargaba007/deepseek-agent-docs/releases)
 
 ---
 

@@ -55,7 +55,7 @@ async function agentLoop(userMessage, maxTurns = 10) {
 
   for (let turn = 0; turn < maxTurns; turn++) {
     const response = await client.chat.completions.create({
-      model: "deepseek-v4-flash",
+      model: "deepseek-flash",
       messages,
       tools,
       toolChoice: "auto",

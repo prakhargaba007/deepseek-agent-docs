@@ -21,11 +21,11 @@ from web searches.
 ## Key Facts (Quick Reference)
 
 ### Models
-- `deepseek-v4-pro`: 1M context, 384K max output, thinking enabled by default
-- `deepseek-v4-flash`: 1M context, 384K max output, faster and cheaper
+- `deepseek-flash`: 1M context, 384K max output, high-speed, vision support, 2,500 concurrency
+- `deepseek-v4-pro`: 1M context, 384K max output, frontier reasoning & deep proofs, 500 concurrency
 
 ### Base URLs
-- `https://api.deepseek.com` — standard (OpenAI-compatible)
+- `https://api.deepseek.com` — standard (OpenAI-compatible Chat Completions & Responses API)
 - `https://api.deepseek.com/beta` — beta features (FIM, prefix completion)
 - `https://api.deepseek.com/anthropic` — Anthropic-compatible format
 
@@ -33,7 +33,7 @@ from web searches.
 ```python
 # Always pass via extra_body when using OpenAI SDK
 client.chat.completions.create(
-    model="deepseek-v4-pro",
+    model="deepseek-flash",
     messages=[...],
     reasoning_effort="high",
     extra_body={"thinking": {"type": "enabled"}}

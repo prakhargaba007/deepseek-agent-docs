@@ -26,6 +26,27 @@ and this project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD`).
 
 ---
 
+## [2026.09.12] — 2026-09-12
+
+### Added
+- **DeepSeek-V4.1-Flash (`deepseek-flash`) GA**: Full documentation for the new 552B MoE model featuring asymmetric Causal Encoder-Decoder architecture (8B active input, 16B active output).
+- **Vision / Multimodal GA**: Image understanding integrated natively into `deepseek-flash` with dynamic token allocation up to 1,024 tokens/image.
+- **OpenAI Responses API (`POST /responses`)**: Added Section 4.6, parameter schemas, input item types (`input_image`), and Python example with `apply_patch` custom tool.
+- **Request Keep-Alive Mechanism**: Documented gateway timeout prevention via HTTP empty-line keep-alive packets during extended thinking phases.
+- **Agent Integrations**: Documented Claude Code `deepseek-flash[1m]`, OpenCode, OpenClaw, and Codex CLI support.
+
+### Changed
+- **Pricing & Rate Limits**: Updated pricing effective September 10, 2026 ($0.15 / $0.30 miss, $0.003 / $0.006 hit, $0.60 / $1.20 output for Flash). Increased concurrency limit to 2,500 for Flash.
+- **`deepseek-v4-pro` Continued**: Maintained DeepSeek-V4-Pro API services beyond September 14, 2026 with 500 concurrency limit.
+- **Thinking Mode `top_p`**: Documented lower bound clamping to 0.95 in thinking mode.
+- **Tool Calls Mid-Conversation**: Documented insertion of tool calls into conversation history in Responses and Anthropic APIs.
+- **Examples Updated**: Updated Python, JavaScript, TypeScript, cURL, and Anthropic SDK examples to use `deepseek-flash`.
+
+### Deprecated / Retired
+- **`deepseek-v4-flash` & `deepseek-v4-flash-vision-exp`**: Officially retired on 2026-09-10; legacy requests automatically route to `deepseek-flash` at Flash rates.
+
+---
+
 ## [2026.09.02] — 2026-09-02
 
 ### Added
@@ -80,12 +101,14 @@ and this project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD`).
 
 | Version | Date | Summary |
 |---|---|---|
+| [2026.09.12] | 2026-09-12 | DeepSeek-V4.1-Flash (`deepseek-flash`) GA, Responses API, lower pricing, GA vision (1024 token cap) |
 | [2026.09.02] | 2026-09-02 | Added DeepSeek-V4-Flash-Vision-Exp, Files API, GA status, and Peak/Off-Peak pricing |
 | [2026.07.25] | 2026-07-25 | Initial public release |
 
 ---
 
-[Unreleased]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.09.02...HEAD
+[Unreleased]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.09.12...HEAD
+[2026.09.12]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.09.02...v2026.09.12
 [2026.09.02]: https://github.com/prakhargaba007/deepseek-agent-docs/compare/v2026.07.25...v2026.09.02
 [2026.07.25]: https://github.com/prakhargaba007/deepseek-agent-docs/releases/tag/v2026.07.25
 

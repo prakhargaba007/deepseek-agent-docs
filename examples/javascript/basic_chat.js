@@ -14,7 +14,7 @@ const client = new OpenAI({
 
 async function main() {
   const response = await client.chat.completions.create({
-    model: "deepseek-v4-flash",
+    model: "deepseek-flash",
     messages: [
       { role: "system", content: "You are a helpful assistant." },
       { role: "user", content: "What is the capital of France?" },

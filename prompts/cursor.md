@@ -16,9 +16,9 @@ DeepSeek API, you MUST follow these rules:
    and behavior.
 
 2. **Use current model names.** The correct model IDs are:
-   - `deepseek-v4-pro` — for complex reasoning, coding, agent tasks
-   - `deepseek-v4-flash` — for fast, cost-efficient tasks
-   Do NOT use `deepseek-chat` or `deepseek-reasoner` (deprecated).
+   - `deepseek-flash` — primary model (DeepSeek-V4.1-Flash) for fast responses, coding, vision, and high concurrency (2500)
+   - `deepseek-v4-pro` — for deep reasoning, STEM proofs, and complex agent tasks (500 concurrency)
+   Do NOT use retired models (`deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`, `deepseek-chat`, `deepseek-reasoner`).
 
 3. **Use the correct base URL.**
    - Standard: `https://api.deepseek.com`

@@ -17,7 +17,7 @@ def main():
     )
 
     response = client.chat.completions.create(
-        model="deepseek-v4-flash",  # Use deepseek-v4-pro for more complex tasks
+        model="deepseek-flash",  # Use deepseek-v4-pro for more complex tasks
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "What is the capital of France?"},

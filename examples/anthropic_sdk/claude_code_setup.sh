@@ -26,13 +26,13 @@ export ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY:?Please set DEEPSEEK_API_KEY}"
 
 # Model routing:
 # - Opus requests (complex tasks) → deepseek-v4-pro
-# - Sonnet and Haiku (fast tasks) → deepseek-v4-flash
+# - Sonnet and Haiku (fast tasks) → deepseek-flash
 
-export ANTHROPIC_MODEL="deepseek-v4-pro"
+export ANTHROPIC_MODEL="deepseek-flash"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-v4-pro"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-v4-pro"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-v4-flash"
-export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-v4-flash"  # Subagents use Flash for speed
+export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-flash"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-flash"
+export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-flash"  # Subagents use Flash for speed
 export CLAUDE_CODE_EFFORT_LEVEL="max"                   # Max reasoning effort
 
 echo ""

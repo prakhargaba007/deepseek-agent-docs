@@ -18,7 +18,7 @@ curl -sN https://api.deepseek.com/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
   -d '{
-    "model": "deepseek-v4-flash",
+    "model": "deepseek-flash",
     "messages": [
       {"role": "user", "content": "Count from 1 to 10 slowly."}
     ],

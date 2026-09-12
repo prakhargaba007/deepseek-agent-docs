@@ -28,18 +28,18 @@ API reference including:
 # Environment setup
 export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=<deepseek-api-key>
-export ANTHROPIC_MODEL=deepseek-v4-pro
+export ANTHROPIC_MODEL=deepseek-flash
 export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro
-export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
+export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-flash
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-flash
+export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-flash
 export CLAUDE_CODE_EFFORT_LEVEL=max
 ```
 
 ### Rules
 
-- **DO** use `deepseek-v4-pro` and `deepseek-v4-flash` as model names
-- **DO NOT** use `deepseek-chat` or `deepseek-reasoner` (deprecated)
+- **DO** use `deepseek-flash` (or `deepseek-flash[1m]`) and `deepseek-v4-pro` as model names
+- **DO NOT** use retired model names (`deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`, `deepseek-chat`, `deepseek-reasoner`)
 - **DO NOT** hardcode API keys
 - When using thinking mode with OpenAI SDK, always pass via `extra_body`
 - For beta features (FIM, prefix completion), use `base_url="https://api.deepseek.com/beta"`

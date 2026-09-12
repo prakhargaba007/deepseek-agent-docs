@@ -2,7 +2,7 @@
 """
 vision.py — Example demonstrating multimodal image analysis with DeepSeek API.
 
-Uses the experimental model `deepseek-v4-flash-vision-exp` to analyze images
+Uses the model `deepseek-flash` to analyze images
 via base64 encoding or external URLs.
 
 Prerequisites:
@@ -33,7 +33,7 @@ def main():
     # Example 1: Image via Public URL
     print("=== Analyzing Image via URL ===")
     response_url = client.chat.completions.create(
-        model="deepseek-v4-flash-vision-exp",
+        model="deepseek-flash",
         messages=[
             {
                 "role": "user",
@@ -61,7 +61,7 @@ def main():
     dummy_base64_png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
     print("=== Analyzing Local Image via Base64 Data URI ===")
     response_b64 = client.chat.completions.create(
-        model="deepseek-v4-flash-vision-exp",
+        model="deepseek-flash",
         messages=[
             {
                 "role": "user",

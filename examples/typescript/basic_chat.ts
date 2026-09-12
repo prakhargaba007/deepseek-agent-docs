@@ -23,7 +23,7 @@ async function chat(
   options: ChatOptions = {}
 ): Promise<string> {
   const {
-    model = "deepseek-v4-flash",
+    model = "deepseek-flash",
     systemPrompt = "You are a helpful assistant.",
     maxTokens = 1024,
   } = options;
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
   const result = await chat(
     "Write a one-line TypeScript function that reverses a string.",
     {
-      model: "deepseek-v4-flash",
+      model: "deepseek-flash",
       systemPrompt: "You are an expert TypeScript developer. Be concise.",
     }
   );

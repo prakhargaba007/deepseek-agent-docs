@@ -19,7 +19,7 @@ class ConversationManager:
 
     def __init__(
         self,
-        model: str = "deepseek-v4-flash",
+        model: str = "deepseek-flash",
         system_prompt: Optional[str] = None,
         max_history_turns: int = 20,
     ):
@@ -63,7 +63,7 @@ class ConversationManager:
 
 def main():
     bot = ConversationManager(
-        model="deepseek-v4-flash",
+        model="deepseek-flash",
         system_prompt="You are a knowledgeable travel guide. Be concise.",
     )
 
